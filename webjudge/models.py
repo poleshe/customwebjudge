@@ -18,6 +18,7 @@ class Tests(models.Model):
     name = models.CharField(max_length=255)
     created_by = models.CharField(max_length=255)
     test_description = models.CharField(max_length=255)
+    test_file_name = models.CharField(max_length=255)
     test_tries = models.IntegerField()
 
 # Resultados de los tests.

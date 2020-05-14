@@ -5,6 +5,8 @@ from django.views import View
 import simplejson as json
 from webjudge.models import *
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, authenticate
 
 # Clase con la que gestionamos que función se debe ejecutar dependiendo del tipo de paso recibido.
 class step_functions:
@@ -58,6 +60,25 @@ class Index(View):
     def get(self, request):
         return render(request, self.template)
 
+class Login(View):
+    template = 'login.html'
+
+    def get(self, request):
+        form = AuthenticationForm()
+        return render(request, self.template, {'form': form})
+
+
+    def post(self, request):
+        form = AuthenticationForm(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect('/')
+        else:
+            return render(request, self.template, {'form': form})
+            
 
 def upload(request):
     if request.method == 'POST':
@@ -66,3 +87,5 @@ def upload(request):
         fs.save(uploaded_file.name, uploaded_file)
         print(" file saved! ")
     return render(request, 'index.html')
+
+
