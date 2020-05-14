@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='main.css'>
+    <script src='main.js'></script>
+</head>
+<body>
+    <script>
+    function sendJSON(){
+        // Creating a XHR object 
+        let xhr = new XMLHttpRequest(); 
+        var url = "http://localhost:8000/api/createteststeps/";
+
+        // open a connection 
+        xhr.open("POST", url, true); 
+
+        // Set the request header i.e. which type of content you are sending 
+        xhr.setRequestHeader("Content-Type", "application/json"); 
+
+        // Create a state change callback 
+        xhr.onreadystatechange = function () { 
+            if (xhr.readyState === 4 && xhr.status === 200) { 
+
+                // Print received data from server 
+                console.log(this.responseText)
+
+            } 
+        }; 
+
+        // Converting JSON data to string 
+        var data = JSON.stringify({"test_id":"1", "steps":[{"basestep_id":"1", "basestep_name":"onclick", "description":"click on input with ID input3", "argument":"input3"},{"basestep_id":"2", "basestep_name":"closewindow", "description":"closes the window", "argument":""}]}); 
+
+        // Sending data with the request 
+        xhr.send(data);
+    }
+
+    function sendJSON2(){
+        let xhr = new XMLHttpRequest(); 
+        var url = "http://localhost:8000/api/createtest/";
+
+        // open a connection 
+        xhr.open("POST", url, true); 
+
+        // Set the request header i.e. which type of content you are sending 
+        xhr.setRequestHeader("Content-Type", "application/json"); 
+
+        // Create a state change callback 
+        xhr.onreadystatechange = function () { 
+            if (xhr.readyState === 4 && xhr.status === 200) { 
+
+                // Print received data from server 
+                console.log(this.responseText)
+
+            } 
+        }; 
+
+        // Converting JSON data to string 
+        var data = JSON.stringify({"name":"Evitando Spoilers", "created_by":"poleshe", "test_description":"Luke skywalkers y censurado", "test_tries": 0}); 
+
+        // Sending data with the request 
+        xhr.send(data);
+    }
+</script>
+
+
+<button onclick="sendJSON()"> CLICK ME! </button>
+
+<button onclick="sendJSON2()"> Create Test! </button>
+</body>
+</html>
