@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views import View
 import simplejson as json
 from webjudge.models import *
+from django.core.files.storage import FileSystemStorage
 
 # Clase con la que gestionamos que función se debe ejecutar dependiendo del tipo de paso recibido.
 class step_functions:
@@ -45,3 +47,22 @@ def create_test_steps(request):
         step_funcs.saveteststeps(test_id, count, step['argument'], step['description'], step['basestep_id'], step['basestep_name'])
 
     return HttpResponse("200")
+
+# @csrf_exempt
+# def execute_test(request):
+
+
+# Renderizar el template de la página home
+class Index(View):
+    template = 'index.html'
+    def get(self, request):
+        return render(request, self.template)
+
+
+def upload(request):
+    if request.method == 'POST':
+        uploaded_file = request.FILES['document']
+        fs = FileSystemStorage()
+        fs.save(uploaded_file.name, uploaded_file)
+        print(" file saved! ")
+    return render(request, 'index.html')

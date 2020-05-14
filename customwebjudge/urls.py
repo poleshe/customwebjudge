@@ -22,6 +22,8 @@ router = routers.DefaultRouter()
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', views.Index.as_view(), name='index'),
+    path('upload', views.upload, name='upload'),
     routers.url(r'^api/createtest/', views.create_test),
     routers.url(r'^api/createteststeps/', views.create_test_steps)
 ]
