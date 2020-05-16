@@ -546,6 +546,7 @@ pre code {
   padding-left: 0.75rem;
   margin-right: auto;
   margin-left: auto;
+  margin-top: 3.5rem;
 }
 @media (min-width: 576px) {
   .container {
@@ -6066,7 +6067,7 @@ a.close.disabled {
 }
 
 .bg-primary {
-  background-color: #007bff !important;
+  background-color: #343a40 !important;
 }
 
 a.bg-primary:hover, a.bg-primary:focus,
