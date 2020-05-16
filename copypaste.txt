@@ -1,1 +1,0 @@
-result = getattr(step_funcs, step['basestep_name'])(user_id, test_id, count, step['argument'], step['description'], step['basestep_id'], step['basestep_name'] )
