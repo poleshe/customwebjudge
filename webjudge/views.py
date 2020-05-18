@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
+from webjudge.forms import SignUpForm
 # Vistas
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 # Otros
 from django.http import HttpResponse
 import simplejson as json
@@ -46,6 +47,33 @@ class Login(View):
             return HttpResponseRedirect('/')
         else:
             return render(request, self.template, {'form': form})
+
+# Función de registro de un usuario nuevo, alumno por defecto.
+def signup(request):
+    # obtenemos el POST
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        # Si el formulario es valido, entonces...
+        if form.is_valid():
+            # Guardamos el usuario en la tabla de usuarios de django
+            user = form.save()
+            user.refresh_from_db()  # Recogemos el objeto creado en la tabla
+            # Asignamos a variables los valores obtenidos del formulario
+            name = form.cleaned_data.get('first_name')
+            surname = form.cleaned_data.get('last_name')
+            # Creamos nuevo objeto de usuarios de webjudge
+            newuser = Users(user=user, role='alumno', name=name, surname=surname)
+            newuser.save()
+            # Por comodidad al usuario, hacemos login directamente si todo ha salido bien.
+            raw_password = form.cleaned_data.get('password1')
+            user = authenticate(username=user.username, password=raw_password)
+            login(request, user)
+            return redirect('/')
+    # Si no es valido, devuelve un formulario vacio, que no crea un usuario y nos hace registrarnos otra vez.
+    else:
+        form = SignUpForm()
+    return render(request, 'signup.html', {'form': form})
+
 
 # Vista para la subida de archivos al servidor
 

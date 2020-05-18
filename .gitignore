@@ -1,0 +1,5 @@
+# Git ignore de los archivos cache y archivos de build...
+__pycache__/
+*.pyc
+*.pyo
+*$py.class
