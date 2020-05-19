@@ -85,7 +85,7 @@
                       {% endfor %}
 
                       <div style="margin: auto; text-align: center; position: relative; width: 50%;"> 
-                        <button onclick="SubForm()" class="btn btn-primary" style="width: 100%;"> Crear cuenta </button>
+                        <button onclick="SubForm()" class="btn btn-primary" style="width: 100%;"> Siguiente </button>
                       </div>
                       </form>
                     {% endblock %}
@@ -105,8 +105,8 @@
                     url:'/api/createtest/',
                     type:'POST',
                     data:$('#newtestform').serialize(),
-                    success:function(){
-                        alert("worked");
+                    success:function(response){
+                        window.location.href = response.redirect_url;
                     }
                 });
             }

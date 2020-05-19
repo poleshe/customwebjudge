@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
-from webjudge.forms import SignUpForm
+from webjudge.forms import SignUpForm, NewTestForm
 # Vistas
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.shortcuts import render, redirect
 # Otros
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 import simplejson as json
 from webjudge.models import *
 from django.core.files.storage import FileSystemStorage
@@ -24,11 +24,37 @@ from django.http import HttpResponseRedirect
 
 class Index(LoginRequiredMixin, View):
     template = 'index.html'
-    login_url = '/login/'
+    login_url = '/login/' 
 
     def get(self, request):
         return render(request, self.template)
 
+    def post(self, request, *args, **kwargs):
+        return render(request, self.template)
+
+class NewTest(LoginRequiredMixin, View):
+    template = 'newtest.html'
+    login_url = '/login/' 
+
+    def get(self, request):
+        form = NewTestForm()
+        return render(request, self.template, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        # create_test(request)
+        return HttpResponse(200)
+
+class UploadTest(LoginRequiredMixin, View):
+    template = 'uploadtest.html'
+    login_url = '/login/' 
+
+    def get(self, request):
+        form = NewTestForm()
+        return render(request, self.template, {'form': form})
+
+    def post(self, request, *args, **kwargs):
+        # create_test(request)
+        return HttpResponse(200)
 
 class Login(View):
     template = 'login.html'
@@ -76,7 +102,7 @@ def signup(request):
 
 
 # Vista para la subida de archivos al servidor
-
+@csrf_exempt
 def upload(request):
     if request.method == 'POST':
         uploaded_file = request.FILES['document']
@@ -107,13 +133,22 @@ class step_functions:
 @csrf_exempt
 def create_test(request):
     # Obtenemos el diccionario que se ha pasado en la peticion.
-    test_data = json.loads(request.body)
-    # Creamos un nuevo objeto a partir del modelo "Tests", usando como argumentos su campos y el valor que queremos darles.
-    newtest = Tests(name=test_data['name'], created_by=test_data['created_by'], test_description=test_data['test_description'], test_tries=0)
-    # Guardamos el modelo en la BD.
-    newtest.save()
+    # test_data = json.loads(request.body)
+    # # Creamos un nuevo objeto a partir del modelo "Tests", usando como argumentos su campos y el valor que queremos darles.
+    # newtest = Tests(name=test_data['name'], created_by=test_data['created_by'], test_description=test_data['test_description'], test_tries=0)
+    # # Guardamos el modelo en la BD.
+    # newtest.save()
+
+
+    if request.method == 'POST':
+        form = NewTestForm(request.POST)
+        if form.is_valid():
+            form = form.cleaned_data.get('name')
+            print(form)
+
     # Devolvemos un OK.
-    return HttpResponse("200")
+    return JsonResponse({'redirect': 'true', 'redirect_url':'/uploadtest/'})
+    
 
 # Funcion que dada una ID de un test y unos pasos, los crea en la base de datos.
 @csrf_exempt

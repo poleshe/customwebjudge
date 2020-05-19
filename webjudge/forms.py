@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
+from .models import *
 
 # Este archivo sirve para crear nuevos formularios a partir de modelos (tablas de la BD).
 # Se crea un objeto con cada una de las rows de la tabla, y algunas extras si queremos, que podemos colocar en un template directamente
@@ -23,3 +24,13 @@ class SignUpForm(UserCreationForm):
         super(SignUpForm, self).__init__(*args, **kwargs)
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
+
+class NewTestForm(forms.Form):
+
+    name = forms.CharField(max_length=30, required=False, help_text='Tu nombre. Será visible en la web.')
+    created_by = forms.CharField(max_length=30, required=False, help_text='Tu nombre. Será visible en la web.')
+    test_description = forms.CharField(max_length=30, required=False, help_text='Tu nombre. Será visible en la web.')
+
+    class Meta:
+        model = Tests
+        fields = ('name', 'created_by', 'test_description')

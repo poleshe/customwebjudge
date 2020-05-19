@@ -23,8 +23,10 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.Index.as_view(), name='index'),
+    path('newtest/', views.NewTest.as_view(), name='newtest'),
+    path('uploadtest/', views.UploadTest.as_view(), name='uploadtest'),
     path('login/', views.Login.as_view(), name='login'),
-    path('upload/', views.upload, name='upload'),
+    routers.url(r'^api/uploadfile/', views.upload, name='upload'),
     routers.url(r'^api/createtest/', views.create_test),
     routers.url(r'^api/createteststeps/', views.create_test_steps),
     routers.url(r'^signup/$', views.signup, name='signup'),
