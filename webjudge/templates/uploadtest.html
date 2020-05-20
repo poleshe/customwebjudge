@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - SB Admin</title>
+        <title> Crear Nuevo Test - WebJudge</title>
         <link href="/static/css/styles.css" rel="stylesheet" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
@@ -56,18 +56,27 @@
             </div>
             <div id="layoutSidenav_content">
                 <main>
-                    <div class="container-fluid">
-                        <h1 class="mt-4">Dashboard</h1>
+                    <div class="container-fluid" style="text-align: center; ">
+                        <h1 class="mt-4">Crear un nuevo test</h1>
+                        <br />
                         <ol class="breadcrumb mb-4">
+                            <p> Sube el archivo base en el que se ejecutará tu test. <br> Principalmente, debe ser un HTML con una base hecha, que contenga un    include de un archivo javascript, del nombre que sea. <BR>  En este archivo se ejecutará el codigo JS que permitirá realizar el test. 
+                                Una forma muy básica puede ser un text input, con un boton, que al pulsarlo se ejecuta una funcion determinada, que es la que se tendrá que programar para realizar el reto. Tienes libertad de añadir lo que quieras a este HTML.
+
+                                <BR> <br>
+                                Recuerda añadir un ID en cada uno de los elementos clave (boton, input...), ya que los pasos del test los utilizan para realizar su funcion.
+                                <BR> <br>
+                                Solo se puede subir un archivo HTML. Si te equivocas, simplemente subelo de nuevo y se sobreescribira.
+                            </p>
                         </ol>
                     </div>
                     <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-                    <h2> Upload </h2>
-                    <form method="POST" enctype="multipart/form-data" action="/api/uploadfile/" target="dummyframe"> <br>
+                    <h2 style="text-align: center"> Subir Archivo </h2>
+                    <form method="POST" enctype="multipart/form-data" action="/api/uploadfile/" target="dummyframe" style="text-align: center"> <br>
                         {% csrf_token %}
-                        <input type="text" name="test_id" id="test_id" value="{{ test_id }} "> 
+                        <input type="text" name="test_id" id="test_id" value="{{ test_id }}" hidden> 
                         <input type="file" name="document">
-                        <button type="submit"> Upload </button>
+                        <button type="submit"> Enviar al servidor </button>
                     </form>
                 </main>
                 <footer class="py-4 bg-light mt-auto">

@@ -27,9 +27,9 @@ class SignUpForm(UserCreationForm):
 
 class NewTestForm(forms.ModelForm):
 
-    name = forms.CharField(max_length=30, required=False, help_text='El nombre del Test.')
-    created_by = forms.CharField(max_length=30, required=False, help_text='Creado por... Puedes usar tu nombre o el de tu organización.')
-    test_description = forms.CharField(widget=forms.Textarea(attrs={"rows":5, "cols":50}),max_length=255, required=False, help_text='Explicación del test. Deberia contener una introduccion, una breve explicacion, y un par de ejemplos de entrada / salida.')
+    name = forms.CharField(max_length=30, required=True, help_text='El nombre del Test.')
+    created_by = forms.CharField(max_length=30, required=True, help_text='Creado por... Puedes usar tu nombre o el de tu organización.')
+    test_description = forms.CharField(widget=forms.Textarea(attrs={"rows":5, "cols":80}),max_length=255, required=True, help_text='Explicación del test. Deberia contener una introduccion, una breve explicacion, y un par de ejemplos de entrada / salida.')
     class Meta:
         model = Tests
         fields = ('name', 'created_by', 'test_description')

@@ -134,8 +134,6 @@ def upload(request):
     # Devolvemos un 200
     return HttpResponse(200)
 
-
-
 # FUNCIONES DE LA API
 # Clase con la que gestionamos que función se debe ejecutar dependiendo del tipo de paso recibido.
 class step_functions:
@@ -158,7 +156,7 @@ def create_test(request):
     if request.method == 'POST':
         form = NewTestForm(request.POST)
         if form.is_valid():
-            # form.save()
+            form.save()
             test = Tests.objects.last()
             test_id = test.id
     # Devolvemos un OK junto a un redirect con la ID del test creado por GET.

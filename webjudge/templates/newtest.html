@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - SB Admin</title>
+        <title> Nuevo Test - WebJudge </title>
         <link href="/static/css/styles.css" rel="stylesheet" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
@@ -44,7 +44,7 @@
                             <div class="sb-sidenav-menu-heading">Core</div>
                             <a class="nav-link" href="index.html"
                                 ><div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                                Dashboard</a
+                                Menu Izquierda - Dashb</a
                             >
                         </div>
                     </div>
@@ -56,14 +56,19 @@
             </div>
             <div id="layoutSidenav_content">
                 <main>
-                    <div class="container-fluid">
-                        <h1 class="mt-4">Dashboard</h1>
+                    <div class="container-fluid" style="text-align: center; ">
+                        <h1 class="mt-4">Crear un nuevo test</h1>
+                        <br>
                         <ol class="breadcrumb mb-4">
+                            <p>  Crear un nuevo test está formado por tres pasos. Una vez terminados, el nuevo test aparecerá en la lista de tests y podrá ser modificado. Pasos:</p>
+                            <p> · El primer paso es crear los datos básicos. Debes poner un nombre al test, quien lo ha creado, y una explicación de lo que se ha de conseguir. Es aconsejable añadir casos de prueba con datos de entrada / salida.</p>
+                            <p> · Después, tendrás que subir el archivo base HTML que contiene la plantilla para ejecutar el test. Mas info en la siguiente página. </p>
+                            <p> · Por ultimo, se añaden los pasos que deberá seguir el test. Ten en cuenta de que se debe completar el test correctamente para poder ser subido a la web, así que prepara tu archivo con la respuesta. </p> 
                         </ol>
                     </div>
                     <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
                     {% block content %}
-                    <form method="post" id="newtestform" target="dummyframe">
+                    <form method="post" id="newtestform" target="dummyframe" style="margin: auto; width:50%;">
                       {% csrf_token %}
                       {% for field in form %}
                         <p>
@@ -78,7 +83,7 @@
                         </p>
                       {% endfor %}
                       <div style="margin: auto; text-align: center; position: relative; width: 50%;"> 
-                        <button onclick="SubForm()" id="nextbutton" class="btn btn-primary" style="width: 100%;" disabled> Siguiente </button>
+                        <button onclick="SubForm()" id="nextbutton" class="btn btn-primary" style="width: 100%;"> Siguiente </button>
                       </div>
                       </form>
                     {% endblock %}
