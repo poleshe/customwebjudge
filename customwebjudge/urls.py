@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from webjudge import views;
-from rest_framework import routers;
+from webjudge import views
+from rest_framework import routers
+from django.conf import settings
+from django.conf.urls.static import static
 
 router = routers.DefaultRouter()
 
@@ -31,4 +33,7 @@ urlpatterns = [
     routers.url(r'^api/createteststeps/', views.create_test_steps),
     routers.url(r'^signup/$', views.signup, name='signup'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

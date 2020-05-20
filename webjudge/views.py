@@ -14,6 +14,8 @@ import simplejson as json
 from webjudge.models import *
 from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect
+import datetime
+import os
 # end imports
 
 
@@ -49,11 +51,10 @@ class UploadTest(LoginRequiredMixin, View):
     login_url = '/login/' 
 
     def get(self, request):
-        form = NewTestForm()
-        return render(request, self.template, {'form': form})
+        test_id = request.GET['test_id']
+        return render(request, self.template,{'test_id': test_id})
 
     def post(self, request, *args, **kwargs):
-        # create_test(request)
         return HttpResponse(200)
 
 class Login(View):
@@ -104,12 +105,34 @@ def signup(request):
 # Vista para la subida de archivos al servidor
 @csrf_exempt
 def upload(request):
+    # Si nos llega un post, hacemos...
     if request.method == 'POST':
+        # Cogemos el archivo desde request.files
         uploaded_file = request.FILES['document']
+        # Cogemos la ID del test, que nos llega por get a través del redirect de create_test
+        test_id = request.POST['test_id']
+        # Creamos un objecto FileSystemStorage
         fs = FileSystemStorage()
+        # Cogemos los datos del test en la db.
+        testdb = Tests.objects.get(id=test_id)
+        # Creamos un nombre nuevo para el archivo con su id y nombre del test. ID es clave primaria y no puede estar repetido.
+        # Además, quitamos la extension .html y la recolocamos al final por si se intenta subir un archivo con una extension que no toca.
+        uploaded_file.name = uploaded_file.name.replace('.html','')
+        uploaded_file.name = testdb.name + "_" + test_id + ".html"
+        uploaded_file.name = uploaded_file.name.replace(' ','')
+        # Comprobamos si este archivo ya existe. Si existe, lo borramos y creamos uno nuevo. 
+        if os.path.exists("webjudge/testfiles/"+uploaded_file.name):
+            print("File exists! Deleting old file...")
+            os.remove("webjudge/testfiles/"+uploaded_file.name)
+        # Guardamos el archivo en el servidor y soltamos un mensaje de log.
         fs.save(uploaded_file.name, uploaded_file)
-        print(" file saved! ")
-    return render(request, 'index.html')
+        print("Archivo de Test guardado correctamente en "+fs.url(uploaded_file.name))
+        # Updateamos la row del test. Añadimos el nombre del archivo y la ruta donde se hará el serve, EJ /media/EjemploTest_4.html
+        testdb.test_file_name = uploaded_file.name
+        testdb.test_url = fs.url(uploaded_file.name)
+        testdb.save()
+    # Devolvemos un 200
+    return HttpResponse(200)
 
 
 
@@ -132,22 +155,14 @@ class step_functions:
 # Funcion para crear un test. Obtiene una request y crea el test.
 @csrf_exempt
 def create_test(request):
-    # Obtenemos el diccionario que se ha pasado en la peticion.
-    # test_data = json.loads(request.body)
-    # # Creamos un nuevo objeto a partir del modelo "Tests", usando como argumentos su campos y el valor que queremos darles.
-    # newtest = Tests(name=test_data['name'], created_by=test_data['created_by'], test_description=test_data['test_description'], test_tries=0)
-    # # Guardamos el modelo en la BD.
-    # newtest.save()
-
-
     if request.method == 'POST':
         form = NewTestForm(request.POST)
         if form.is_valid():
-            form = form.cleaned_data.get('name')
-            print(form)
-
-    # Devolvemos un OK.
-    return JsonResponse({'redirect': 'true', 'redirect_url':'/uploadtest/'})
+            # form.save()
+            test = Tests.objects.last()
+            test_id = test.id
+    # Devolvemos un OK junto a un redirect con la ID del test creado por GET.
+    return JsonResponse({'redirect': 'true', 'redirect_url':'/uploadtest/?test_id='+str(test_id)+''})
     
 
 # Funcion que dada una ID de un test y unos pasos, los crea en la base de datos.
