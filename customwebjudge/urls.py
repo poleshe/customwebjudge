@@ -27,6 +27,7 @@ urlpatterns = [
     path('', views.Index.as_view(), name='index'),
     path('newtest/', views.NewTest.as_view(), name='newtest'),
     path('uploadtest/', views.UploadTest.as_view(), name='uploadtest'),
+    path('newsteps/', views.NewSteps.as_view(), name='newsteps'),
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.logout),
     routers.url(r'^api/uploadfile/', views.upload, name='upload'),

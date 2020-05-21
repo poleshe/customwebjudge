@@ -73,6 +73,25 @@ class UploadTest(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         return HttpResponse(200)
 
+class NewSteps(LoginRequiredMixin, View):
+    template = 'newsteps.html'
+    login_url = '/login/' 
+
+    def get(self, request):
+        test_id = request.GET['test_id']
+        # Obtenemos el objeto de usuario de la BD del usuario actual.
+        requestuser = User.objects.get(username=request.user.username)
+        # Cogemos sus datos.
+        realuser = Users.objects.get(user=requestuser)
+        # Cogemos los datos de los base_steps, que son los esqueletos de los pasos.
+        base_steps = Base_steps.objects.all()
+        print(base_steps[0].step_name)
+        # Devolvemos la vista junto a los datos y el nombre del template.
+        return render(request, self.template,{'test_id': test_id, 'userinfo':realuser, 'base_steps': base_steps})
+
+    def post(self, request, *args, **kwargs):
+        return HttpResponse(200)
+
 class Login(View):
     template = 'login.html'
 
@@ -89,7 +108,7 @@ class Login(View):
             login(request, user)
             return HttpResponseRedirect('/')
         else:
-            return render(request, self.template, {'form': form})
+            return render(request, self.template, {'form': form}) 
 
 # Funcion para cerrar sesion
 def logout(request):

@@ -1,0 +1,23 @@
+{% include "base_head.html" %}
+
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid" style="text-align: center; ">
+            <h1 class="mt-4">Añadir pasos al test</h1>
+            <br />
+            <ol class="breadcrumb mb-4">
+                <p> Los pasos son las acciones que se realizarán para detectar si la respuesta es correcta o no. Puedes añadir tantos pasos como quieras. <br />
+
+                    <br />Simplemente, elige un paso de la lista, y forma un pequeño testcase a partir de ellos. Puedes diferenciar los elementos usando su ID, cuando hagas click en un paso tendrás la opcion de decidir donde <br />
+
+                    <br />Antes de poder subir el test, se ejecutaran todos los pasos. Si alguno falla, no podrás subir el test. No te preocupes, puedes cambiar los pasos tantas veces como quieras, antes y despues.
+               
+                    <br /> TIP: Si tu documento base no tiene un botón para reiniciar las entradas de texto, puedes usar el paso de reiniciar la página para borrarlos. 
+                </p>
+            </ol>
+        </div>
+        <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+        <h2 style="text-align: center"> Subir Archivo </h2>
+    </main>
+
+{% include "base_footer.html" %}
