@@ -85,7 +85,6 @@ class NewSteps(LoginRequiredMixin, View):
         realuser = Users.objects.get(user=requestuser)
         # Cogemos los datos de los base_steps, que son los esqueletos de los pasos.
         base_steps = Base_steps.objects.all()
-        print(base_steps[0].step_name)
         # Devolvemos la vista junto a los datos y el nombre del template.
         return render(request, self.template,{'test_id': test_id, 'userinfo':realuser, 'base_steps': base_steps})
 
@@ -170,7 +169,7 @@ def upload(request):
                 print("File exists! Deleting old file...")
                 os.remove("webjudge/testfiles/"+test_id+"/"+uploaded_file.name)
             # Guardamos el archivo en el servidor y soltamos un mensaje de log.
-            fs.save(uploaded_file.name, uploaded_file)
+            fs.save(test_id+"/"+uploaded_file.name, uploaded_file)
             print("Archivo de Test guardado correctamente en "+fs.url("/templates/"+test_id+"/"+uploaded_file.name))
             # Updateamos la row del test. Añadimos el nombre del archivo y la ruta donde se hará el serve, EJ /media/EjemploTest_4.html
             testdb.test_file_name = uploaded_file.name
