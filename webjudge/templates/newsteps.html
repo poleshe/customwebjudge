@@ -2,8 +2,8 @@
 
 <div id="layoutSidenav_content">
     <main>
-        <div class="container-fluid" style="text-align: center; ">
-            <h1 class="mt-4">Añadir pasos al test</h1>
+        <div class="container-fluid">
+            <h1 class="mt-4" style="text-align: center; ">Añadir pasos al test</h1>
             <br />
             <ol class="breadcrumb mb-4">
                 <p> Los pasos son las acciones que se realizarán para detectar si la respuesta es correcta o no. Puedes añadir tantos pasos como quieras. <br />
@@ -94,39 +94,42 @@
             }
         }
 
-        // Array que contiene todos los pasos añadidos al test.
+        // Array que contiene todos los pasos añadidos al test, y un array que contiene un json con los datos necesarios.
         var step_list = []
         var steps_json = []
-        
         var count = 0;
+
+        // Funcion que se ejecuta cada vez que añadimos un nuevo paso.
         function add_step(){
             step_info = []
+            // Buildeamos el array para crear la lista que contiene todos los pasos, y pusheamos al array principal.
             step_info['basestep_desc'] = document.getElementById("step_desc").textContent;
             step_info['argument'] = document.getElementById("step_args").value;
             step_info['count'] = count;
             step_list.push(step_info);
             count++;
-            
-            step_json = {'basestep_desc': step_info['basestep_desc'], 'step_args': step_info['argument']}
-
+            // Buildeamos el JSON. Cogemos test_id del sistema de templates de django.
+            test_id = {{test_id}}
+            step_json = {'basestep_desc': step_info['basestep_desc'], 'step_args': step_info['argument'], 'test_id': test_id, 'count':count  }
+            // Push al json
             steps_json.push(step_json)
-
-            console.log(steps_json)
-
+            // Limpiamos el cuadrado que contiene step list
             document.getElementById("step_list_body").innerHTML = ""
-
+            // Volvemos a generar el cuadrado de step_list con lios nuevos valores del array
             step_list.forEach(add_step_list);
         }
 
+        // funcion del foreach
         function add_step_list(item, index){
             document.getElementById("step_list_body").innerHTML += "<p class='stepdescription2' style='padding: 15px; margin: 5px; border-radius: 15px; background-color: rgba(0, 0, 0, 0.03);'>" + item['basestep_desc'] + "<span class='deletestep' onclick='deletestep(" +item.count + ")'> <i class='far fa-window-close' style='font-size: 32px; color: red'> </i> </span> </p>"
         }
-
+        // Funcion para borrar un paso. Buscamos la posicion en la que se encuentra el paso, lo borramos, y regeneramos la lista.
         function deletestep(stepposition){
             position = 0;
             step_list.forEach( function(item, indice, array) {
                 if(item.count == stepposition){
                     step_list.splice(position, 1)
+                    steps_json.splice(position, 1)
                 } else {
                     position++
                 }
@@ -135,8 +138,8 @@
             step_list.forEach(add_step_list);
         }
 
+        // Sendtest se ejecuta al enviar el test. Transforma el array a json y lo manda via ajax.
         function sendtest(){
-
             send_json = JSON.stringify(steps_json)
 
             $.ajax({

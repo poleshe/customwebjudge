@@ -144,53 +144,62 @@ def signup(request):
     return render(request, 'signup.html', {'form': form})
 
 
-# Vista para la subida de archivos al servidor
+# Vista para la subida de archivos al servidor.
 @csrf_exempt
 def upload(request):
     # Si nos llega un post, hacemos...
     if request.method == 'POST':
-        # Cogemos el archivo desde request.files
-        uploaded_file = request.FILES['document']
-        # Cogemos la ID del test, que nos llega por get a través del redirect de create_test
-        test_id = request.POST['test_id']
-        # Creamos un objecto FileSystemStorage
-        fs = FileSystemStorage()
-        # Cogemos los datos del test en la db.
-        testdb = Tests.objects.get(id=test_id)
-        # Creamos un nombre nuevo para el archivo con su id y nombre del test. ID es clave primaria y no puede estar repetido.
-        # Además, quitamos la extension .html y la recolocamos al final por si se intenta subir un archivo con una extension que no toca.
-        uploaded_file.name = uploaded_file.name.replace('.html','')
-        uploaded_file.name = testdb.name + "_" + test_id + ".html"
-        uploaded_file.name = uploaded_file.name.replace(' ','')
-        # Comprobamos si este archivo ya existe. Si existe, lo borramos y creamos uno nuevo. 
-        if os.path.exists("webjudge/testfiles/"+uploaded_file.name):
-            print("File exists! Deleting old file...")
-            os.remove("webjudge/testfiles/"+uploaded_file.name)
-        # Guardamos el archivo en el servidor y soltamos un mensaje de log.
-        fs.save(uploaded_file.name, uploaded_file)
-        print("Archivo de Test guardado correctamente en "+fs.url(uploaded_file.name))
-        # Updateamos la row del test. Añadimos el nombre del archivo y la ruta donde se hará el serve, EJ /media/EjemploTest_4.html
-        testdb.test_file_name = uploaded_file.name
-        testdb.test_url = fs.url(uploaded_file.name)
-        testdb.save()
+        # Comprobamos que archivo es, si el HTML o el JS.
+        file_type = request.POST['file_type']
+        if(file_type == "html"):
+            # Cogemos el archivo desde request.files
+            uploaded_file = request.FILES['document']
+            # Cogemos la ID del test, que nos llega por get a través del redirect de create_test
+            test_id = request.POST['test_id']
+            # Creamos un objecto FileSystemStorage
+            fs = FileSystemStorage()
+            # Cogemos los datos del test en la db.
+            testdb = Tests.objects.get(id=test_id)
+            # Creamos un nombre nuevo para el archivo con su id y nombre del test. ID es clave primaria y no puede estar repetido.
+            # Además, quitamos la extension .html y la recolocamos al final por si se intenta subir un archivo con una extension que no toca.
+            uploaded_file.name = uploaded_file.name.replace('.html','')
+            uploaded_file.name = testdb.name + "_" + test_id + ".html"
+            uploaded_file.name = uploaded_file.name.replace(' ','')
+            # Comprobamos si este archivo ya existe. Si existe, lo borramos y creamos uno nuevo. 
+            if os.path.exists("webjudge/testfiles/"+test_id+"/"+uploaded_file.name):
+                print("File exists! Deleting old file...")
+                os.remove("webjudge/testfiles/"+test_id+"/"+uploaded_file.name)
+            # Guardamos el archivo en el servidor y soltamos un mensaje de log.
+            fs.save(uploaded_file.name, uploaded_file)
+            print("Archivo de Test guardado correctamente en "+fs.url("/templates/"+test_id+"/"+uploaded_file.name))
+            # Updateamos la row del test. Añadimos el nombre del archivo y la ruta donde se hará el serve, EJ /media/EjemploTest_4.html
+            testdb.test_file_name = uploaded_file.name
+            testdb.test_url = fs.url(test_id+"/"+uploaded_file.name)
+            testdb.save()
+        else:
+            # Cogemos el archivo desde request.files
+            uploaded_file = request.FILES['document']
+            # Cogemos la ID del test, que nos llega por get a través del redirect de create_test
+            test_id = request.POST['test_id']
+            # Creamos un objecto FileSystemStorage
+            fs = FileSystemStorage()
+            # Cogemos los datos del test en la db.
+            testdb = Tests.objects.get(id=test_id)
+            # Comprobamos si este archivo ya existe. Si existe, lo borramos y creamos uno nuevo. 
+            if os.path.exists("webjudge/testfiles/"+test_id+"/"+uploaded_file.name):
+                print("File exists! Deleting old file...")
+                os.remove("webjudge/testfiles/"+test_id+"/"+uploaded_file.name)
+            # Guardamos el archivo en el servidor y soltamos un mensaje de log.
+            fs.save(test_id+"/"+uploaded_file.name, uploaded_file)
+            print("Archivo de Test guardado correctamente en "+fs.url("/templates/"+test_id+"/"+uploaded_file.name))
+            # Updateamos la row del test. Añadimos el nombre del archivo y la ruta donde se hará el serve, EJ /media/EjemploTest_4.html
+            testdb.test_answer_name = uploaded_file.name
+            testdb.test_answer_url = fs.url(test_id+"/"+uploaded_file.name)
+            testdb.save()
     # Devolvemos un 200
     return HttpResponse(200)
 
 # FUNCIONES DE LA API
-# Clase con la que gestionamos que función se debe ejecutar dependiendo del tipo de paso recibido.
-class step_functions:
-
-    def saveteststeps(self, test_id, count, argument, description, basestep_id, basestep_name):
-        # Creamos un nuevo modelo con test_steps y lo insertamos en la BD.
-        newteststeps = Test_steps(
-            test_id=test_id,
-            step_number=count,
-            step_argument=argument,
-            step_description=description,
-            basestep_id=basestep_id,
-            basestep_name=basestep_name
-        )
-        newteststeps.save()
 
 # Funcion para crear un test. Obtiene una request y crea el test.
 @csrf_exempt
@@ -206,24 +215,15 @@ def create_test(request):
     
 
 # Funcion que dada una ID de un test y unos pasos, los crea en la base de datos.
+# TODO: EJECUTAR TEST ANTES DE GUARDAR...
 @csrf_exempt
 def create_test_steps(request):
-    # # Obtenemos el diccionario que se ha pasado en la peticion.
-    # test_steps = json.loads(request.body)
-    # # Guardamos en test_id en una variable mas accesible
-    # test_id = test_steps['test_id']
-    # # Creamos el objeto que contiene la creación de los pasos de los tests, y empezamos un count
-    # step_funcs = step_functions()
-    # count = 0
-    # # Iteramos sobre el diccionario. Por cada paso que hay, lo guardamos en la bd.
-    # for step in test_steps["steps"]:
-    #     count = count + 1
-    #     step_funcs.saveteststeps(test_id, count, step['argument'], step['description'], step['basestep_id'], step['basestep_name'])
+    
     if request.method == 'POST':
         test_steps = request.POST.get('data', 'default')
         test_steps = json.loads(test_steps)
         for steps in test_steps:
-            print(steps['basestep_desc'])
+            print(steps['test_id'])
 
     return HttpResponse("200")
 

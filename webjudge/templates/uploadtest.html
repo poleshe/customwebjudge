@@ -2,11 +2,12 @@
 
             <div id="layoutSidenav_content">
                 <main>
-                    <div class="container-fluid" style="text-align: center; ">
-                        <h1 class="mt-4">Crear un nuevo test</h1>
+                    <div class="container-fluid">
+                        <h1 class="mt-4" style="text-align: center; ">Crear un nuevo test</h1>
                         <br />
                         <ol class="breadcrumb mb-4">
-                            <p> Sube el archivo base en el que se ejecutará tu test. <br> Principalmente, debe ser un HTML con una base hecha, que contenga un    include de un archivo javascript, del nombre que sea. <BR>  En este archivo se ejecutará el codigo JS que permitirá realizar el test. 
+                            <p> Sube el archivo base en el que se ejecutará tu test. <br> Principalmente, debe ser un HTML con una base hecha, que contenga un include de un archivo javascript, del nombre que sea. <BR>
+                                <br />También debes subir el archivo con el codigo JS que resuelva tu test. <br /> <br />  En este archivo se ejecutará el codigo JS que permitirá realizar el test. 
                                 Una forma muy básica puede ser un text input, con un boton, que al pulsarlo se ejecuta una funcion determinada, que es la que se tendrá que programar para realizar el reto. Tienes libertad de añadir lo que quieras a este HTML.
 
                                 <BR> <br>
@@ -17,31 +18,75 @@
                         </ol>
                     </div>
                     <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-                    <h2 style="text-align: center"> Subir Archivo </h2>
-                    <form method="POST" enctype="multipart/form-data" id="uploadform" action="/api/uploadfile/" target="dummyframe" style="text-align: center"> <br>
-                        {% csrf_token %}
-                        <input type="text" name="test_id" id="test_id" value="{{ test_id }}" hidden> 
-                        <input type="file" name="document">
-                        <button type="submit"> Enviar al servidor </button>
-                    </form>
-                    <p style="margin: auto; text-align: center; color: green; display: none" id="subido"> Archivo subido correctamente! </p>
+                    <BR>
+
+                    <div class="card" style="margin: auto; margin-left: 13%; text-align: center; width: 35%; float: left;">
+                        <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                        <div class="card-header">
+                            Archivo HTML
+                        </div>
+                            <div class="card-body">
+                                <form method="POST" enctype="multipart/form-data" id="uploadformhtml" action="/api/uploadfile/" target="dummyframe" style="text-align: center"> <br>
+                                    {% csrf_token %}
+                                    <input type="text" name="test_id" id="test_id" value="{{ test_id }}" hidden> 
+                                    <input type="text" name="file_type" id="file_type" value="html" hidden> 
+                                    <input type="file" name="document">
+                                    <button type="submit"> Enviar al servidor </button>
+                                    <p style="margin: auto; text-align: center; color: green; display: none" id="subidohtml"> Archivo subido correctamente! </p>
+                                </form>
+                            </div>
+                        </div>
+
+                    <div class="card" style="margin: auto; margin-left: 5%; margin-bottom: 50px; text-align: center; width: 35%; float: left;">
+                        <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                        <div class="card-header">
+                            Archivo JavaScript
+                        </div>
+                            <div class="card-body">
+                                <form method="POST" enctype="multipart/form-data" id="uploadformjs" action="/api/uploadfile/" target="dummyframe" style="text-align: center"> <br>
+                                    {% csrf_token %}
+                                    <input type="text" name="test_id" id="test_id" value="{{ test_id }}" hidden> 
+                                    <input type="text" name="file_type" id="file_type" value="js" hidden> 
+                                    <input type="file" name="document">
+                                    <button type="submit"> Enviar al servidor </button>
+                                    <p style="margin: auto; text-align: center; color: green; display: none" id="subidojs"> Archivo subido correctamente! </p>
+                                </form>
+                            </div>
+                        </div>
+
+                   
+
+                    
                     <br /> <br />
                     <button class="btn btn-primary" style="width: 30%; margin-left: 36em;" disabled id="next" onclick="gonext()"> Siguiente paso </button>
                     <script> 
                         
-                        function callback(){
-                            var p = document.getElementById("subido");
+                        function callbackhtml(){
+                            var p = document.getElementById("subidohtml");
+                            p.style.display = "block";
+                            if(document.getElementById("subidojs").display != "none" && document.getElementById("subidohtml").display != "none"){
+                                document.getElementById("next").disabled = false;
+                            }
+                            
+                        }
+
+                        function callbackjs(){
+                            var p = document.getElementById("subidojs");
                             p.style.display = "block";
                             document.getElementById("next").disabled = false;
+                            if(document.getElementById("subidojs").display != "none" && document.getElementById("subidohtml").display != "none"){
+                                document.getElementById("next").disabled = false;
+                            }
                         }
 
                         function gonext(){
                             window.location.href = "/newsteps/?test_id={{ test_id }}";
                         }
 
-                        var ele = document.getElementById("uploadform");
-
-                        $(ele).submit(callback);
+                        var ele = document.getElementById("uploadformhtml");
+                        var ele2 = document.getElementById("uploadformjs");
+                        $(ele).submit(callbackhtml);
+                        $(ele2).submit(callbackjs);
                         
                         </script>
                 </main>
