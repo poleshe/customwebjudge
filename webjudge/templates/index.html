@@ -10,6 +10,45 @@
                       </div>
                       </form>
 
+              <div class="card" style=" margin: 5% 5% 0% 10%; text-align: left; width: 30%; float: left;">
+              <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                  <div class="card-body">
+                      <p> <b> Usuario: </b> {{ userinfo.user.username }}</p>
+                      <p> <b> Nombre: </b> {{ userinfo.name }} {{ userinfo.surname }}</p>
+                      <p> <b> Email: </b> {{ userinfo.user.email }}</p>
+                      <p> En esta web eres un/a {{ userinfo.role }}/a.</p>
+                  </div>
+                    <div class="card" style="min-height: 200px; max-height: 150px;margin: auto; margin-bottom: 5%; text-align: left; width: 90%; float: left; overflow-y: auto">
+                      <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                      <div class="card-header">
+                        Tests realizados
+                    </div>
+                          <div class="card-body" style="height: 50px; overflow-y: auto;">
+                            {% for test in userinfo.tests_done %}
+                              <p> {{ test }} </p>
+                            {% endfor %}
+                          </div>
+                      </div>
+                </div>
+
+                <br>
+
+                <div class="card" style="margin: auto; margin-top: 3.6%; margin-left: 1%; margin-bottom: 50px; text-align: center; width: 45%;">
+                    <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                    <div class="card-header">
+                        Estadísticas de los tests realizados
+                    </div>
+                        <div class="card-body">
+                          <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button" class="btn btn-secondary">Mas Intentos</button>
+                            <button type="button" class="btn btn-secondary">Mas Aciertos</button>
+                            <button type="button" class="btn btn-secondary">Nuevos</button>
+                            <button type="button" class="btn btn-secondary">Usuario con mas aciertos</button>
+                          </div>
+                            
+                        </div>
+                    </div>
+
                 </main>
 
 

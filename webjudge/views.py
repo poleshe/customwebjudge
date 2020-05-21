@@ -130,7 +130,7 @@ def signup(request):
             name = form.cleaned_data.get('first_name')
             surname = form.cleaned_data.get('last_name')
             # Creamos nuevo objeto de usuarios de webjudge
-            newuser = Users(user=user, role='alumno', name=name, surname=surname)
+            newuser = Users(user=user, role='Alumno', name=name, surname=surname)
             newuser.save()
             # Por comodidad al usuario, hacemos login directamente si todo ha salido bien.
             raw_password = form.cleaned_data.get('password1')
