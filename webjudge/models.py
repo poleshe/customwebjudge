@@ -19,6 +19,8 @@ class Tests(models.Model):
     test_description = models.CharField(max_length=255)
     test_file_name = models.CharField(max_length=255, null = True)
     test_url = models.CharField(max_length=255, null=True)
+    test_answer_name = models.CharField(max_length=255, null=True)
+    test_answer_url = models.CharField(max_length=255, null=True)
     test_tries = models.IntegerField(default=0)
 
 # Resultados de los tests.

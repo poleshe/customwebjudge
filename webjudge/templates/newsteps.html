@@ -17,7 +17,138 @@
             </ol>
         </div>
         <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
-        <h2 style="text-align: center"> Subir Archivo </h2>
+
+        <div style="position: relative; width: 100%;">
+
+            <div class="card" style="margin: 0% 5% 0% 5%; text-align: center; width: 50%; float: left;">
+            <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+            <div class="card-header">
+                Lista de pasos:
+            </div>
+                <div class="card-body" style="height: 280px; overflow-y: auto;">
+                    {% for step in base_steps %}
+                    <p onclick="step_options('{{ step.step_description }}', '{{ step.step_hasargument }}')" class="stepdescription" style="padding: 15px; margin: 5px; border-radius: 15px; background-color: rgba(0, 0, 0, 0.03);">
+                        {{ step.step_description }}
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card" style="margin: auto; text-align: center; width: 35%; float: left;">
+                <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                <div class="card-header">
+                    Opciones del paso:
+                </div>
+                    <div class="card-body" style="height: 280px; overflow-y: auto;">
+                        <p> Paso seleccionado: </p>
+                        <p class="stepdescription" id="step_desc" style="padding: 15px; margin: 5px; border-radius: 15px; background-color: rgba(0, 0, 0, 0.03);">
+                            Por favor, selecciona un paso.
+                        </p>
+
+                        <p style="margin-top: 20px;"> Argumento: <input type="text" style="width: 70%" id="step_args" disabled> </p>
+
+                        <button type="button" onclick="add_step()" id="add_step" style="margin-top: 2%" class="btn btn-primary" disabled> Añadir paso </button>
+                    </div>
+                </div>
+        </div>
+        <br />
+        <div class="card" style=" position: relative; margin: auto; margin-bottom: 50px; top: 20px; text-align: center; width: 80%; overflow-y: auto; height: 400px;">
+            <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+            <div class="card-header">
+                Pasos añadidos al test:
+            </div>
+                <div id="step_list_body" class="card-body" style="height: 280px; overflow-y: auto;">
+                    <p style="color: lightgray">
+                        Nada por aquí...
+                    </p>
+                </div>
+            </div>
+
+            <button type="button" onclick="sendtest()" style="position:relative; width: 50%; margin: auto; text-align: center;" class="btn btn-primary"> Crear test! </button>
     </main>
 
+    <script>
+        // Se ejecuta al seleccionar un step
+        function step_options(step_description, arguments){
+            // Cambiamos la descripcion por la del step
+            document.getElementById("step_desc").innerHTML = step_description;
+            // Si no tiene argumentos, dejamos añadir el paso directamente.
+            if(arguments == 0){
+                document.getElementById("step_args").disabled = true;
+                document.getElementById("step_args").value = "No tiene argumentos."
+                document.getElementById("add_step").disabled = false
+            // Si tiene argumentos, desbloqueamos el input y le dejamos añadir argumentos.
+            } else {
+                document.getElementById("step_args").disabled = false;
+                document.getElementById("step_args").value = ""
+                document.getElementById("add_step").disabled = true
+            }
+
+            // Funcion keyup para detectar el argumento. Si hay algo escrito, podemos subirlo. Si no, se pone disabled el botón.
+            step_args.onkeyup = function(){
+                if(document.getElementById("step_args").value != ""){
+                    document.getElementById("add_step").disabled = false
+                } else {
+                    document.getElementById("add_step").disabled = true
+                }
+            }
+        }
+
+        // Array que contiene todos los pasos añadidos al test.
+        var step_list = []
+        var steps_json = []
+        
+        var count = 0;
+        function add_step(){
+            step_info = []
+            step_info['basestep_desc'] = document.getElementById("step_desc").textContent;
+            step_info['argument'] = document.getElementById("step_args").value;
+            step_info['count'] = count;
+            step_list.push(step_info);
+            count++;
+            
+            step_json = {'basestep_desc': step_info['basestep_desc'], 'step_args': step_info['argument']}
+
+            steps_json.push(step_json)
+
+            console.log(steps_json)
+
+            document.getElementById("step_list_body").innerHTML = ""
+
+            step_list.forEach(add_step_list);
+        }
+
+        function add_step_list(item, index){
+            document.getElementById("step_list_body").innerHTML += "<p class='stepdescription2' style='padding: 15px; margin: 5px; border-radius: 15px; background-color: rgba(0, 0, 0, 0.03);'>" + item['basestep_desc'] + "<span class='deletestep' onclick='deletestep(" +item.count + ")'> <i class='far fa-window-close' style='font-size: 32px; color: red'> </i> </span> </p>"
+        }
+
+        function deletestep(stepposition){
+            position = 0;
+            step_list.forEach( function(item, indice, array) {
+                if(item.count == stepposition){
+                    step_list.splice(position, 1)
+                } else {
+                    position++
+                }
+            });
+            document.getElementById("step_list_body").innerHTML = ""
+            step_list.forEach(add_step_list);
+        }
+
+        function sendtest(){
+
+            send_json = JSON.stringify(steps_json)
+
+            $.ajax({
+                type: "POST",
+                data: {data: send_json},
+                url: "/api/createteststeps/",
+                dataType: "json",
+                success: function(msg){
+                    $('.answer').html(msg);
+                }
+                });
+        }
+
+    </script> 
 {% include "base_footer.html" %}

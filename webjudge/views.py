@@ -208,17 +208,22 @@ def create_test(request):
 # Funcion que dada una ID de un test y unos pasos, los crea en la base de datos.
 @csrf_exempt
 def create_test_steps(request):
-    # Obtenemos el diccionario que se ha pasado en la peticion.
-    test_steps = json.loads(request.body)
-    # Guardamos en test_id en una variable mas accesible
-    test_id = test_steps['test_id']
-    # Creamos el objeto que contiene la creación de los pasos de los tests, y empezamos un count
-    step_funcs = step_functions()
-    count = 0
-    # Iteramos sobre el diccionario. Por cada paso que hay, lo guardamos en la bd.
-    for step in test_steps["steps"]:
-        count = count + 1
-        step_funcs.saveteststeps(test_id, count, step['argument'], step['description'], step['basestep_id'], step['basestep_name'])
+    # # Obtenemos el diccionario que se ha pasado en la peticion.
+    # test_steps = json.loads(request.body)
+    # # Guardamos en test_id en una variable mas accesible
+    # test_id = test_steps['test_id']
+    # # Creamos el objeto que contiene la creación de los pasos de los tests, y empezamos un count
+    # step_funcs = step_functions()
+    # count = 0
+    # # Iteramos sobre el diccionario. Por cada paso que hay, lo guardamos en la bd.
+    # for step in test_steps["steps"]:
+    #     count = count + 1
+    #     step_funcs.saveteststeps(test_id, count, step['argument'], step['description'], step['basestep_id'], step['basestep_name'])
+    if request.method == 'POST':
+        test_steps = request.POST.get('data', 'default')
+        test_steps = json.loads(test_steps)
+        for steps in test_steps:
+            print(steps['basestep_desc'])
 
     return HttpResponse("200")
 

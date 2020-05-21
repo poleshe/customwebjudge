@@ -10213,3 +10213,17 @@ body {
 .sb-sidenav-light .sb-sidenav-footer {
   background-color: #e9ecef;
 }
+
+.stepdescription:hover {
+  background-color: rgba(0, 0, 0, 0.15) !important;
+  cursor: pointer;
+}
+
+.deletestep{
+  float:right;
+  margin-right: 20px;
+}
+
+.deletestep:hover{
+  cursor: pointer;
+}
