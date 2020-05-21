@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
 from webjudge.forms import SignUpForm, NewTestForm
+from django.contrib.auth import logout as do_logout
 # Vistas
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
@@ -27,9 +28,14 @@ import os
 class Index(LoginRequiredMixin, View):
     template = 'index.html'
     login_url = '/login/' 
-
+    
     def get(self, request):
-        return render(request, self.template)
+        # Obtenemos el objeto de usuario de la BD del usuario actual.
+        requestuser = User.objects.get(username=request.user.username)
+        # Cogemos sus datos.
+        realuser = Users.objects.get(user=requestuser)
+        # Devolvemos la vista junto a los datos y el nombre del template.
+        return render(request, self.template, {'userinfo':realuser})
 
     def post(self, request, *args, **kwargs):
         return render(request, self.template)
@@ -40,7 +46,12 @@ class NewTest(LoginRequiredMixin, View):
 
     def get(self, request):
         form = NewTestForm()
-        return render(request, self.template, {'form': form})
+        # Obtenemos el objeto de usuario de la BD del usuario actual.
+        requestuser = User.objects.get(username=request.user.username)
+        # Cogemos sus datos.
+        realuser = Users.objects.get(user=requestuser)
+        # Devolvemos la vista junto a los datos y el nombre del template.
+        return render(request, self.template, {'form': form, 'userinfo':realuser})
 
     def post(self, request, *args, **kwargs):
         # create_test(request)
@@ -52,7 +63,12 @@ class UploadTest(LoginRequiredMixin, View):
 
     def get(self, request):
         test_id = request.GET['test_id']
-        return render(request, self.template,{'test_id': test_id})
+        # Obtenemos el objeto de usuario de la BD del usuario actual.
+        requestuser = User.objects.get(username=request.user.username)
+        # Cogemos sus datos.
+        realuser = Users.objects.get(user=requestuser)
+        # Devolvemos la vista junto a los datos y el nombre del template.
+        return render(request, self.template,{'test_id': test_id, 'userinfo':realuser})
 
     def post(self, request, *args, **kwargs):
         return HttpResponse(200)
@@ -74,6 +90,13 @@ class Login(View):
             return HttpResponseRedirect('/')
         else:
             return render(request, self.template, {'form': form})
+
+# Funcion para cerrar sesion
+def logout(request):
+    # Finalizamos la sesión
+    do_logout(request)
+    # Redireccionamos a la portada
+    return redirect('/')
 
 # Función de registro de un usuario nuevo, alumno por defecto.
 def signup(request):
