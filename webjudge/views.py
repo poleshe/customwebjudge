@@ -17,6 +17,12 @@ from django.core.files.storage import FileSystemStorage
 from django.http import HttpResponseRedirect
 import datetime
 import os
+import time
+# Selenium
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver import ActionChains
+from selenium.webdriver.common.keys import Keys
 # end imports
 
 
@@ -228,6 +234,114 @@ def create_test_steps(request):
 
 # @csrf_exempt
 # def execute_test(request):
+
+
+
+
+
+# STEPS CLASS
+# Esta clase contiene una funcion por cada paso...
+
+class Step_Execution():
+    test_id = 0
+    driver = webdriver.Remote(command_executor='http://127.0.0.1:4444/wd/hub', desired_capabilities=DesiredCapabilities.CHROME)
+    
+    def __init__(self, test_id): 
+        self.test_id = test_id
+    
+    def reloadventana(argument):
+        try:
+            driver.refresh()
+            return True
+        except Exception as e:
+            print(e)
+            print("an error ocurred")
+
+    def clickonid(argument):
+        try:
+            driver.find_element_by_name(argument).click()
+            return True
+        except Exception as e:
+            print(e)
+            print("an error ocurred")
+            return False
+    
+    def esperartexto(argument):
+        count=0
+        max_tries = 10
+        while True:
+            if argument in driver.page_source:
+                return True
+            if count > max_tries:
+                print("error happened")
+                return False
+            else:
+                count+=1
+                time.sleep(1)
+
+    def escribirenid(argument):
+        try:
+            input_object = driver.find_element_by_name(argument)
+            input_object.send_keys(argument)
+            return True
+        except Exception as e:
+            print(e)
+            print("an error ocurred")
+            return False
+
+    def wait(argument):
+        try:
+            driver.implicitly_wait(argument)
+            return True
+        except Exception as e:
+            print(e)
+            print("an error ocurred")
+            return False
+
+        
+
+    
+    
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
