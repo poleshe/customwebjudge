@@ -32,6 +32,7 @@ urlpatterns = [
     path('logout/', views.logout),
     routers.url(r'^api/uploadfile/', views.upload, name='upload'),
     routers.url(r'^api/createtest/', views.create_test),
+    routers.url(r'^api/checksteps/', views.create_temporal_test_steps),
     routers.url(r'^api/createteststeps/', views.create_test_steps),
     routers.url(r'^signup/$', views.signup, name='signup'),
 ]

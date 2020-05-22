@@ -26,6 +26,16 @@ from selenium.webdriver.common.keys import Keys
 # end imports
 
 
+#############################################################
+##################### CUSTOMWEBJUDGE API ####################
+###  En esta api se realizan los render de las templates, ###
+###  Se tratan todos los datos que vienen del front       ###
+###  Se ejecutan los tests contra el docker de selenium   ###
+###  Y se realiza el AUTH de la web, registro, y login.   ###
+###  Además, funciona genial :)                           ###
+#############################################################
+
+
 # Renderizar el template de la página home. Principalmente las funciones del frontend.
 # Como funciona la autentificacion:
 #   Cualquier clase o vista que contenga el aprametro "LoginRequiredMixin" comprobará si nos hemos logeado.
@@ -220,7 +230,9 @@ def create_test(request):
     
 
 # Funcion que dada una ID de un test y unos pasos, los crea en la base de datos.
-# TODO: EJECUTAR TEST ANTES DE GUARDAR...
+# Funcion execute_test
+# Esta funcion guarda los pasos de un test que ya ha sido validado.
+# Tan solo obtiene los pasos y los guarda en la base de datos.
 @csrf_exempt
 def create_test_steps(request):
     
@@ -229,24 +241,42 @@ def create_test_steps(request):
         test_steps = json.loads(test_steps)
         steps_count = 1
         test_id = test_steps[0]['test_id']
+
         for step in test_steps:
             newstep = Test_steps(test_id = step['test_id'], basestep_name = step['basestep_name'], step_argument = step['step_args'], step_number = steps_count, step_description = "filler")
-            # newstep.save()
+            newstep.save()
             steps_count = steps_count + 1
 
-        # TODO EXECUTE TEST AND RETURN EITHER TRUE OR FALSE
+        return HttpResponse(status=200)
 
+# Sirve para guardar los pasos en la BD y tambien comprueba si el test es valido.
+@csrf_exempt
+def create_temporal_test_steps(request):
+    # Si es post, manejamos...
+    if request.method == 'POST':
+        # Obtenemos los datos y los serializamos
+        test_steps = request.POST.get('data', 'default')
+        test_steps = json.loads(test_steps)
+        steps_count = 1
+        test_id = test_steps[0]['test_id']
+        # Por cada paso, lo guardamos en la base de datos.
+        for step in test_steps:
+            newstep = Test_steps(test_id = step['test_id'], basestep_name = step['basestep_name'], step_argument = step['step_args'], step_number = steps_count, step_description = "filler")
+            newstep.save()
+            steps_count = steps_count + 1
+        # Comprobamos que funciona usando la funcion test_valido. Dependiendo si es valido o no, enviamos un codigo o otro al frontend.
         valido = test_valido(request, test_id)
     if(valido == True):
-        print("El test con id "+str(test_id)+" es valido y se guardara.")
-        return HttpResponse("Valid")
+        print("El test con id "+str(test_id)+" es valido.")
+        return HttpResponse(status=200)
     else:
         print("El test con id "+str(test_id)+" es invalido. Se borraran sus pasos.")
-        return HttpResponse("Invalid")
-        
+        return HttpResponse(status=500)
+
+    
 @csrf_exempt
 def execute_test(request):
-    # Obtenemos los pasos del test que se ejecuta y el test
+    # Obtenemos los pasos del test que 
     current_test_steps = Test_steps.objects.filter(test_id=1).order_by("step_number")
     test = Tests.objects.filter(id=1)
     # Obtenemos la url donde esta guardado este test, y la id del test
@@ -261,7 +291,11 @@ def execute_test(request):
         result = getattr(step_executer, step.basestep_name)(step.step_argument)
         print(result)
 
+
+
+####################################################################
 # Este test se ejecuta cuando queremos crear un test, y comprueba si el test es valido o no, es decir, si se ha completado correctamente.
+####################################################################
 @csrf_exempt
 def test_valido(request, test_id):
     # Obtenemos los pasos del test que se ejecuta y el test
@@ -274,15 +308,18 @@ def test_valido(request, test_id):
     step_executer = Step_Execution(test_id)
     step_executer.abrir_nodo()
     # Por cada paso obtenido, lo ejecutamos.
-    # TODO SI FALLA .... SI NO FALLA....
+    # Lo ejecutamos en la clase Step_Execution, en nuestro caso alojada en step_executer. Cada step tiene su propia funcion en la clase.
+    # De este modo podemos cambiar los pasos muy facilmente. Si uno de estos pasos falla, se devuelve un False, lo que significa que el test ha fallado.
+    # Si no, devuelve un True, y seguimos. Al final borramos los pasos de la base de datos porque no son los pasos finales que queremos usar.
     for step in current_test_steps:
         result = getattr(step_executer, step.basestep_name)(step.step_argument)
         if(result == False):
             print("El paso "+step.basestep_name+" ha fallado.")
-            # Test_steps.objects.filter(test_id=test_id).delete()
+            Test_steps.objects.filter(test_id=test_id).delete()
             return False
         else:
             print("El paso "+step.basestep_name+" se ha completado correctamente.")
+    Test_steps.objects.filter(test_id=test_id).delete()
     return True
 
 # STEPS CLASS

@@ -57,14 +57,17 @@
             <div class="card-header">
                 Pasos añadidos al test:
             </div>
-                <div id="step_list_body" class="card-body" style="height: 280px; overflow-y: auto;">
-                    <p style="color: lightgray">
-                        Nada por aquí...
-                    </p>
-                </div>
+            <div id="step_list_body" class="card-body" style="height: 280px; overflow-y: auto;">
+                <p style="color: lightgray">
+                    Nada por aquí...
+                </p>
             </div>
-
-            <button type="button" onclick="sendtest()" style="position:relative; width: 50%; margin: auto; text-align: center;" class="btn btn-primary"> Crear test! </button>
+         </div>
+        <div style="width: 80%; margin: auto; text-align: center"> 
+            <button type="button" id="sendcomprobar" onclick="sendtest_comprobar()" style="width: 50%; margin: auto !important; text-align: center;" class="btn btn-primary"> Comprobar test </button>
+            <p id="estadotest" style="margin: 25px 0 25px 0px;; font-weight: bold;"> </p>
+            <button type="button" id="sendreal" onclick="sendtest()" style="position:relative; width: 50%; margin-bottom: 50px; text-align: center;" class="btn btn-primary" disabled> Crear test! </button>
+        </div>
     </main>
 
     <script>
@@ -108,7 +111,6 @@
             step_info['argument'] = document.getElementById("step_args").value;
             step_info['count'] = count;
             step_info['basename'] = document.getElementById("basestepname").innerText;
-            console.log(step_info['basename'])
             step_list.push(step_info);
             count++;
             // Buildeamos el JSON. Cogemos test_id del sistema de templates de django.
@@ -120,6 +122,8 @@
             document.getElementById("step_list_body").innerHTML = ""
             // Volvemos a generar el cuadrado de step_list con lios nuevos valores del array
             step_list.forEach(add_step_list);
+            document.getElementById("sendreal").disabled = true;
+            document.getElementById("estadotest").innerHTML = "";
         }
 
         // funcion del foreach
@@ -139,9 +143,37 @@
             });
             document.getElementById("step_list_body").innerHTML = ""
             step_list.forEach(add_step_list);
+            document.getElementById("sendreal").disabled = true;
+            document.getElementById("estadotest").innerHTML = "";
         }
 
         // Sendtest se ejecuta al enviar el test. Transforma el array a json y lo manda via ajax.
+        function sendtest_comprobar(){
+            send_json = JSON.stringify(steps_json)
+
+            document.getElementById("estadotest").innerHTML = "El test se está ejecutando. Por favor, espera....";
+            document.getElementById("sendreal").disabled = true;
+            document.getElementById("estadotest").style.color = "black";
+            $.ajax({
+                type: "POST",
+                data: {data: send_json},
+                url: "/api/checksteps/",
+                dataType: "json",
+                statusCode: {
+                    500: function () {
+                       document.getElementById("estadotest").innerHTML = "El test NO es válido. Comprueba los pasos y prueba de nuevo.";
+                       document.getElementById("estadotest").style.color = "red";
+                       document.getElementById("sendreal").disabled = true;
+                    },
+                    200: function (data) {
+                       document.getElementById("estadotest").innerHTML = "El test es válido! Todos los pasos han funcionado.";
+                       document.getElementById("estadotest").style.color = "green";
+                       document.getElementById("sendreal").disabled = false;
+                    }
+                }
+                });
+        }
+
         function sendtest(){
             send_json = JSON.stringify(steps_json)
 
@@ -150,10 +182,12 @@
                 data: {data: send_json},
                 url: "/api/createteststeps/",
                 dataType: "json",
-                success: function(msg){
-                    // location.href = '/'
+                statusCode: {
+                    200: function (data) {
+                       location.href = "/";
+                    }
                 }
-                });
+            });
         }
 
     </script> 
