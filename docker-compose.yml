@@ -8,8 +8,8 @@ services:
     ports:
       - "4444:4444"
     environment:
-      GRID_BROWSER_TIMEOUT: 30
-      GRID_TIMEOUT: 30
+      GRID_BROWSER_TIMEOUT: 10
+      GRID_TIMEOUT: 10
 
   chrome:
     image: selenium/node-chrome:3.141.59-20200515

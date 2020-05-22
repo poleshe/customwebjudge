@@ -228,84 +228,126 @@ def create_test_steps(request):
         test_steps = request.POST.get('data', 'default')
         test_steps = json.loads(test_steps)
         steps_count = 1
+        test_id = test_steps[0]['test_id']
         for step in test_steps:
-            newstep = Test_steps(test_id = step['test_id'], basestep_name = step['basestep_desc'], step_argument = step['step_args'], step_number = steps_count, step_description = "filler")
-            newstep.save()
+            newstep = Test_steps(test_id = step['test_id'], basestep_name = step['basestep_name'], step_argument = step['step_args'], step_number = steps_count, step_description = "filler")
+            # newstep.save()
             steps_count = steps_count + 1
 
         # TODO EXECUTE TEST AND RETURN EITHER TRUE OR FALSE
-    return HttpResponse("200")
+
+        valido = test_valido(request, test_id)
+    if(valido == True):
+        print("El test con id "+str(test_id)+" es valido y se guardara.")
+        return HttpResponse("Valid")
+    else:
+        print("El test con id "+str(test_id)+" es invalido. Se borraran sus pasos.")
+        return HttpResponse("Invalid")
         
 @csrf_exempt
 def execute_test(request):
-    x = 0
+    # Obtenemos los pasos del test que se ejecuta y el test
+    current_test_steps = Test_steps.objects.filter(test_id=1).order_by("step_number")
+    test = Tests.objects.filter(id=1)
+    # Obtenemos la url donde esta guardado este test, y la id del test
+    test_url = test[0].test_url
+    test_id = current_test_steps[0].test_id
+    # Creamos un nuevo objeto que ejecuta los steps. Tambien abrimos un nodo de conexion con un navegador chrome.
+    step_executer = Step_Execution(test_id)
+    step_executer.abrir_nodo()
+    # Por cada paso obtenido, lo ejecutamos.
+    # TODO SI FALLA .... SI NO FALLA....
+    for step in current_test_steps:
+        result = getattr(step_executer, step.basestep_name)(step.step_argument)
+        print(result)
 
-
-
+# Este test se ejecuta cuando queremos crear un test, y comprueba si el test es valido o no, es decir, si se ha completado correctamente.
+@csrf_exempt
+def test_valido(request, test_id):
+    # Obtenemos los pasos del test que se ejecuta y el test
+    current_test_steps = Test_steps.objects.filter(test_id=test_id).order_by("step_number")
+    test = Tests.objects.filter(id=test_id)
+    # Obtenemos la url donde esta guardado este test, y la id del test
+    test_url = test[0].test_url
+    test_id = current_test_steps[0].test_id
+    # Creamos un nuevo objeto que ejecuta los steps. Tambien abrimos un nodo de conexion con un navegador chrome.
+    step_executer = Step_Execution(test_id)
+    step_executer.abrir_nodo()
+    # Por cada paso obtenido, lo ejecutamos.
+    # TODO SI FALLA .... SI NO FALLA....
+    for step in current_test_steps:
+        result = getattr(step_executer, step.basestep_name)(step.step_argument)
+        if(result == False):
+            print("El paso "+step.basestep_name+" ha fallado.")
+            # Test_steps.objects.filter(test_id=test_id).delete()
+            return False
+        else:
+            print("El paso "+step.basestep_name+" se ha completado correctamente.")
+    return True
 
 # STEPS CLASS
 # Esta clase contiene una funcion por cada paso...
-
-try:
-    driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
-except Exception as e:
-    print (" Error de coneaxión. ")
-    print(e)
-
 class Step_Execution():
     test_id = 0
-    global driver
+    driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
     
     def __init__(self, test_id): 
         self.test_id = test_id
-    
-    def reloadventana(argument):
-        try:
-            driver.refresh()
-            return True
-        except Exception as e:
-            print(e)
-            print("an error ocurred")
+        
+    def abrir_nodo(self):
+        self.driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
+        self.driver.get('https://www.google.com')
 
-    def clickonid(argument):
+    def reloadventana(self, argument):
         try:
-            driver.find_element_by_name(argument).click()
+            self.driver.refresh()
             return True
         except Exception as e:
             print(e)
-            print("an error ocurred")
+            self.driver.quit()
+            return False
+
+    def clickonid(self, argument):
+        try:
+            self.driver.find_element_by_name(argument).click()
+            return True
+        except Exception as e:
+            print(e)
+            self.driver.quit()
             return False
     
-    def esperartexto(argument):
+    def esperartexto(self, argument):
         count=0
         max_tries = 10
         while True:
-            if argument in driver.page_source:
+            if argument in self.driver.page_source:
                 return True
             if count > max_tries:
-                print("error happened")
+                self.driver.quit()
                 return False
             else:
                 count+=1
                 time.sleep(1)
 
-    def escribirenid(argument):
+    def escribirenid(self, argument):
         try:
-            input_object = driver.find_element_by_name(argument)
+            input_object = self.driver.find_element_by_name(argument)
             input_object.send_keys(argument)
             return True
         except Exception as e:
             print(e)
-            print("an error ocurred")
+            self.driver.quit()
             return False
 
-    def wait(argument):
+    def esperar_segundos(self, argument):
         try:
-            driver.implicitly_wait(argument)
+            self.driver.implicitly_wait(int(argument))
+            time.sleep(int(argument))
+            print("Done waiting...")
             return True
         except Exception as e:
             print(e)
-            print("an error ocurred")
+            self.driver.quit()
             return False
 
         
