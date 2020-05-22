@@ -8,7 +8,7 @@ from selenium.webdriver.common.keys import Keys
 class CustomError(Exception):
     pass
 
-driver = webdriver.Remote(command_executor='http://127.0.0.1:4444/wd/hub', desired_capabilities=DesiredCapabilities.CHROME)
+# driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
 
 driver.get('https://www.google.com')
 driver.implicitly_wait(5)

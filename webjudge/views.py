@@ -227,14 +227,18 @@ def create_test_steps(request):
     if request.method == 'POST':
         test_steps = request.POST.get('data', 'default')
         test_steps = json.loads(test_steps)
-        for steps in test_steps:
-            print(steps['test_id'])
+        steps_count = 1
+        for step in test_steps:
+            newstep = Test_steps(test_id = step['test_id'], basestep_name = step['basestep_desc'], step_argument = step['step_args'], step_number = steps_count, step_description = "filler")
+            newstep.save()
+            steps_count = steps_count + 1
 
+        # TODO EXECUTE TEST AND RETURN EITHER TRUE OR FALSE
     return HttpResponse("200")
-
-# @csrf_exempt
-# def execute_test(request):
-
+        
+@csrf_exempt
+def execute_test(request):
+    x = 0
 
 
 
@@ -242,9 +246,15 @@ def create_test_steps(request):
 # STEPS CLASS
 # Esta clase contiene una funcion por cada paso...
 
+try:
+    driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
+except Exception as e:
+    print (" Error de coneaxión. ")
+    print(e)
+
 class Step_Execution():
     test_id = 0
-    driver = webdriver.Remote(command_executor='http://127.0.0.1:4444/wd/hub', desired_capabilities=DesiredCapabilities.CHROME)
+    global driver
     
     def __init__(self, test_id): 
         self.test_id = test_id

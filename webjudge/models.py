@@ -34,7 +34,6 @@ class Test_results(models.Model):
 # Contiene los pasos de los tests.
 class Test_steps(models.Model):
     test_id = models.CharField(max_length=255)
-    basestep_id = models.CharField(max_length=255)
     basestep_name = models.CharField(max_length=255)
     step_argument = models.CharField(max_length=255, null=True)
     step_number = models.IntegerField()
