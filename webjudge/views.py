@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.mixins import LoginRequiredMixin
-from webjudge.forms import SignUpForm, NewTestForm
+from webjudge.forms import SignUpForm, NewTestForm, ModifyUser
 from django.contrib.auth import logout as do_logout
 # Vistas
 from django.views.decorators.csrf import csrf_exempt
@@ -50,10 +50,43 @@ class Index(LoginRequiredMixin, View):
         requestuser = User.objects.get(username=request.user.username)
         # Cogemos sus datos.
         realuser = Users.objects.get(user=requestuser)
+        #Cogemos todos los tests para enseñarlos en la lista
+        tests = Tests.objects.all()
         # Devolvemos la vista junto a los datos y el nombre del template.
-        return render(request, self.template, {'userinfo':realuser})
+        return render(request, self.template, {'userinfo':realuser, 'tests':tests})
 
     def post(self, request, *args, **kwargs):
+        return render(request, self.template)
+
+class UserAdmin(LoginRequiredMixin, View):
+    template = 'user_config.html'
+    login_url = '/login/' 
+    
+    def get(self, request):
+        # Obtenemos el objeto de usuario de la BD del usuario actual.
+        requestuser = User.objects.get(username=request.user.username)
+        # Cogemos sus datos.
+        realuser = Users.objects.get(user=requestuser)
+        form = ModifyUser(initial={'first_name':realuser.name, 'last_name': realuser.surname, 'email':realuser.user.email})
+        # Devolvemos la vista junto a los datos y el nombre del template.
+        return render(request, self.template, {'userinfo':realuser, 'form':form})
+
+    def post(self, request, *args, **kwargs):
+        if request.method == 'POST':
+            form = ModifyUser(request.POST)
+            # Si el formulario es valido, entonces...
+            if form.is_valid():
+                # Primero cogemos el usuario que ha pedido el cambio
+                user = User.objects.get(username=request.user.username)
+                webjudgeuser = Users.objects.get(user=user)
+                # Actualizamos nombre, usuario y email
+                webjudgeuser.name = form.cleaned_data.get('first_name')
+                webjudgeuser.surname = form.cleaned_data.get('last_name')
+                user.email = form.cleaned_data.get('email')
+                # Y guardamos en la base de datos los cambios.
+                webjudgeuser.save()
+                user.save()
+                return redirect('/user_admin/')
         return render(request, self.template)
 
 class NewTest(LoginRequiredMixin, View):

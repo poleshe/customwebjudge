@@ -25,6 +25,23 @@ class SignUpForm(UserCreationForm):
         for visible in self.visible_fields():
             visible.field.widget.attrs['class'] = 'form-control'
 
+# Formulario para cambiar los datos de usuario
+class ModifyUser(forms.ModelForm):
+    # campos extras y información extra para el form. Salen en forma de ayuda.
+    first_name = forms.CharField(max_length=30, required=False, help_text='Tu nombre. Será visible en la web.')
+    last_name = forms.CharField(max_length=30, required=False, help_text='Tu apellido. Será visible en la web.')
+    email = forms.EmailField(max_length=254, help_text='Obligatorio. Por favor, introduce un email válido.')
+    # Campo meta, le decimos el nombre del modelo y el orden de los campos.
+    class Meta:
+        model = Users
+        fields = ('first_name', 'last_name', 'email')
+    
+    # Funcion init para añadir a cada campo del formulario la clase "form-control" de bootstrap que les da un estilo muy bonito.
+    def __init__(self, *args, **kwargs):
+        super(ModifyUser, self).__init__(*args, **kwargs)
+        for visible in self.visible_fields():
+            visible.field.widget.attrs['class'] = 'form-control'
+
 class NewTestForm(forms.ModelForm):
 
     name = forms.CharField(max_length=30, required=True, help_text='El nombre del Test.')

@@ -1,0 +1,45 @@
+{% include "base_head.html"%}
+
+   <div id="layoutSidenav_content">
+      <main>
+          <div class="container-fluid">
+          </div>
+
+    <div class="container-fluid" style="text-align: center; ">
+        <h1 class="mt-4"> Panel de Control del Usuario </h1>
+        <br>
+        <ol class="breadcrumb mb-4" style="text-align: right; width: 50%; margin: auto">
+            <p>  Aquí puedes cambiar tus datos basicos del usuario, como tu nombre o tu email.</p> <br/>
+            <p>  Si necesitas cambiar la contraseña, ponte en contacto con un profesor. </p>
+        </ol>
+    </div>
+    <div class="card shadow-lg border-0 rounded-lg mt-5" style="position: relative; width: 60%; margin: auto; border-radius: 50px;">
+        <div style="position: relative; width: 60%; margin: auto" class="card-body">
+          {% block content %}
+         <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <p>
+                {{ field.label_tag }}<br>
+                {{ field }}
+                {% if field.help_text %}
+                    <small style="color: grey">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <p style="color: red">{{ error }}</p>
+                {% endfor %}
+                </p>
+            {% endfor %}
+            <div style="margin: auto; text-align: center; position: relative; width: 50%;"> 
+                <button type="submit" class="btn btn-primary" style="width: 100%;"> Modificar usuario </button>
+            </div>
+            </form>
+            {% endblock %}
+        </div>
+    </div>
+
+</main>
+
+
+{% include "base_footer.html"%}
+

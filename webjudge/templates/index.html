@@ -1,16 +1,12 @@
 {% include "base_head.html"%}
 
-            <div id="layoutSidenav_content">
-                <main>
-                    <div class="container-fluid">
-                    </div>
-                        <br />
-                      <div style="margin: auto; text-align: center; position: relative; width: 50%;"> 
-                        <button onclick="location.href='/newtest/'" class="btn btn-primary" style="width: 100%;"> Crear nuevo test </button>
-                      </div>
-                      </form>
+   <div id="layoutSidenav_content">
+      <main>
+          <div class="container-fluid">
+          </div>
+              <br />
 
-              <div class="card" style=" margin: 5% 5% 0% 10%; text-align: left; width: 30%; float: left;">
+              <div class="card" style=" margin: 1.6% 5% 0% 10%; text-align: left; width: 30%; float: left;">
               <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
                   <div class="card-body">
                       <p> <b> Usuario: </b> {{ userinfo.user.username }}</p>
@@ -21,7 +17,7 @@
                     <div class="card" style="min-height: 200px; max-height: 150px;margin: auto; margin-bottom: 5%; text-align: left; width: 90%; float: left; overflow-y: auto">
                       <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
                       <div class="card-header">
-                        Tests realizados
+                        Retos realizados
                     </div>
                           <div class="card-body" style="height: 50px; overflow-y: auto;">
                             {% for test in userinfo.tests_done %}
@@ -33,10 +29,10 @@
 
                 <br>
 
-                <div class="card" style="margin: auto; margin-top: 3.6%; margin-left: 1%; margin-bottom: 50px; text-align: center; width: 45%; height: 430px;">
+                <div class="card" style="margin: auto; margin-left: 1%; margin-bottom: 50px; text-align: center; width: 45%; height: 430px;">
                     <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
                   <div class="card-header">
-                      Estadísticas de los tests realizados
+                      Estadísticas de los retos realizados
                   </div>
                       <div class="card-body">
                         <div class="btn-group" role="group" aria-label="Basic example">
@@ -50,18 +46,39 @@
                   </div>
 
 
-                  <div class="card" style="margin: auto; margin-bottom: 50px; text-align: center; width: 70%;">
+                  <div class="card" style="margin: auto; margin-bottom: 50px; text-align: center; width: 70%; max-height: 500px; overflow-y: scroll">
                     <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
                   <div class="card-header">
-                      Lista de tests disponibles
+                      Lista de retos disponibles
                   </div>
-                      <div class="card-body">
-                        <div class="btn-group" role="group" aria-label="Basic example">
-                          
-                        </div>
-                          
-                      </div>
+                  <table class="table table-striped">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col"> Título </th>
+                        <th scope="col"> Creado por </th>
+                        <th scope="col"> Nº de intentos </th>
+                      </tr>
+                    </thead>
+
+                      <tbody>
+                        {% for test in tests %}
+                          <tr>
+                            <th scope="row"> {{test.name}} </th>
+                            <td> {{ test.created_by}}</td>
+                            <td> {{ test.test_tries}}</td>
+
+                        {% endfor %}
+                          </tr>
+                      </tbody>
+
+                  </table>
                   </div>
+
+                  {% if userinfo.role == 'Profesor' %}
+                    <div style="margin: auto; text-align: center; position: relative; width: 50%; margin-bottom: 40px;"> 
+                      <button onclick="location.href='/newtest/'" class="btn btn-primary" style="width: 100%;"> Crear nuevo reto </button>
+                    </div>
+                  {% endif %}
 
                 </main>
 
