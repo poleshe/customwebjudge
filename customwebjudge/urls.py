@@ -30,11 +30,13 @@ urlpatterns = [
     path('newsteps/', views.NewSteps.as_view(), name='newsteps'),
     path('login/', views.Login.as_view(), name='login'),
     path('user_admin/', views.UserAdmin.as_view(), name='useradmin'),
+    path('reto/', views.Reto.as_view(), name='reto'),
     path('logout/', views.logout),
     routers.url(r'^api/uploadfile/', views.upload, name='upload'),
     routers.url(r'^api/createtest/', views.create_test),
     routers.url(r'^api/checksteps/', views.create_temporal_test_steps),
     routers.url(r'^api/createteststeps/', views.create_test_steps),
+    routers.url(r'^api/uploadanswer/', views.intento, name='intento'),
     routers.url(r'^signup/$', views.signup, name='signup'),
 ]
 

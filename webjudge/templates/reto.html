@@ -1,0 +1,48 @@
+{% include "base_head.html"%}
+
+<div id="layoutSidenav_content">
+    <main>
+        <div class="container-fluid">
+        </div>
+        <br />
+        <div class="container-fluid" style="text-align: center; ">
+                <h1 class="mt-4"> {{ test.name }}</h1>
+                <br>
+                <ol class="breadcrumb mb-4" style="text-align: right; width: 70%; margin: auto">
+                    <p>  {{ test.test_description }}</p>
+                </ol>
+        </div>
+
+        <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+        <div class="card" style="margin: auto; margin-left: 13%; text-align: center; width: 35%; float: left;">
+            <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                <div class="card-body">
+                        <p style="margin: auto; text-align: left"> · Puedes intentar el reto las veces que quieras. </p>
+                        <p style="margin: auto; text-align: left"> · Solo tienes que subir el archivo JavaScript con la solucion. </p>
+                        <p style="margin: auto; text-align: left"> · Se comprobarán casos clave, asi que haz pruebas antes de enviarlo a corrección. </p>
+                        <p style="margin: auto; text-align: left"> · Dependiendo del reto, puede tardar un poco. Ten paciencia!. </p>
+                </div>
+            </div>
+
+        <div class="card" style="margin: auto; margin-left: 5%; margin-bottom: 50px; text-align: center; width: 35%; float: left;">
+            <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+            <div class="card-header">
+                Archivo JavaScript
+            </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" id="uploadformjs" action="/api/uploadanswer/" target="dummyframe" style="text-align: center"> <br>
+                        {% csrf_token %}
+                        <input type="text" name="test_id" id="test_id" value="{{ test.id }}" hidden>
+                        <input type="file" name="document">
+                        <button type="submit"> Enviar al servidor </button>
+                        <p style="margin: auto; text-align: center; color: green; display: none" id="subidojs"> Archivo subido correctamente! </p>
+                    </form>
+                </div>
+            </div>
+              
+
+</main>
+
+
+{% include "base_footer.html"%}
+

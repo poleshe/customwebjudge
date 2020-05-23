@@ -140,6 +140,24 @@ class NewSteps(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         return HttpResponse(200)
 
+class Reto(LoginRequiredMixin, View):
+    template = 'reto.html'
+    login_url = '/login/' 
+    
+    def get(self, request):
+        # Obtenemos el objeto de usuario de la BD del usuario actual.
+        requestuser = User.objects.get(username=request.user.username)
+        # Cogemos sus datos.
+        realuser = Users.objects.get(user=requestuser)
+        #Cogemos el test que queremos mostrar
+        test_id = request.GET['test_id']
+        test = Tests.objects.get(id=test_id)
+        # Devolvemos la vista junto a los datos y el nombre del template.
+        return render(request, self.template, {'userinfo':realuser, 'test':test})
+
+    def post(self, request, *args, **kwargs):
+        return render(request, self.template)
+
 class Login(View):
     template = 'login.html'
 
@@ -247,6 +265,35 @@ def upload(request):
     # Devolvemos un 200
     return HttpResponse(200)
 
+@csrf_exempt
+def intento(request):
+    # Si nos llega un post, hacemos...
+    if request.method == 'POST':
+        # Cogemos el archivo desde request.files
+        uploaded_file = request.FILES['document']
+        # Cogemos la ID del test, que nos llega por get a través del redirect de create_test
+        test_id = request.POST['test_id']
+        # Creamos un objecto FileSystemStorage
+        fs = FileSystemStorage()
+        # Cogemos los datos del test en la db.
+        testdb = Tests.objects.get(id=test_id)
+        # Comprobamos si este archivo ya existe. Si existe, lo borramos y creamos uno nuevo. 
+        if os.path.exists("webjudge/testfiles/"+test_id+"/"+testdb.test_answer_name):
+            print("Reemplazando archivo...")
+            os.rename("webjudge/testfiles/"+test_id+"/"+testdb.test_answer_name, "webjudge/testfiles/"+test_id+"/backup_"+testdb.test_answer_name)
+        # Guardamos el archivo en el servidor y soltamos un mensaje de log.
+        fs.save(test_id+"/"+testdb.test_answer_name, uploaded_file)
+        print("Archivo de Intento de Test guardado correctamente en "+fs.url("/templates/"+test_id+"/"+uploaded_file.name))
+        valido = test_valido(request, test_id)
+        os.rename("webjudge/testfiles/"+test_id+"/backup_"+testdb.test_answer_name, "webjudge/testfiles/"+test_id+"/"+testdb.test_answer_name)
+        if(valido == True):
+            print("El test con id "+str(test_id)+" es valido.")
+            return HttpResponse(status=200)
+        else:
+            print("El test con id "+str(test_id)+" es invalido. Se borraran sus pasos.")
+            return HttpResponse(status=500)
+        
+
 # FUNCIONES DE LA API
 
 # Funcion para crear un test. Obtiene una request y crea el test.
@@ -299,6 +346,7 @@ def create_temporal_test_steps(request):
             steps_count = steps_count + 1
         # Comprobamos que funciona usando la funcion test_valido. Dependiendo si es valido o no, enviamos un codigo o otro al frontend.
         valido = test_valido(request, test_id)
+        Test_steps.objects.filter(test_id=test_id).delete()
     if(valido == True):
         print("El test con id "+str(test_id)+" es valido.")
         return HttpResponse(status=200)
@@ -316,7 +364,7 @@ def execute_test(request):
     test_url = test[0].test_url
     test_id = current_test_steps[0].test_id
     # Creamos un nuevo objeto que ejecuta los steps. Tambien abrimos un nodo de conexion con un navegador chrome.
-    step_executer = Step_Execution(test_id)
+    step_executer = Step_Execution(test_id, test_url)
     step_executer.abrir_nodo()
     # Por cada paso obtenido, lo ejecutamos.
     # TODO SI FALLA .... SI NO FALLA....
@@ -336,9 +384,8 @@ def test_valido(request, test_id):
     test = Tests.objects.filter(id=test_id)
     # Obtenemos la url donde esta guardado este test, y la id del test
     test_url = test[0].test_url
-    test_id = current_test_steps[0].test_id
     # Creamos un nuevo objeto que ejecuta los steps. Tambien abrimos un nodo de conexion con un navegador chrome.
-    step_executer = Step_Execution(test_id)
+    step_executer = Step_Execution(test_id, test_url) #todo pasarle el archivo
     step_executer.abrir_nodo()
     # Por cada paso obtenido, lo ejecutamos.
     # Lo ejecutamos en la clase Step_Execution, en nuestro caso alojada en step_executer. Cada step tiene su propia funcion en la clase.
@@ -348,25 +395,25 @@ def test_valido(request, test_id):
         result = getattr(step_executer, step.basestep_name)(step.step_argument)
         if(result == False):
             print("El paso "+step.basestep_name+" ha fallado.")
-            Test_steps.objects.filter(test_id=test_id).delete()
             return False
         else:
             print("El paso "+step.basestep_name+" se ha completado correctamente.")
-    Test_steps.objects.filter(test_id=test_id).delete()
     return True
 
 # STEPS CLASS
 # Esta clase contiene una funcion por cada paso...
 class Step_Execution():
     test_id = 0
+    test_url = ""
     driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
     
-    def __init__(self, test_id): 
+    def __init__(self, test_id, test_url): 
         self.test_id = test_id
+        self.test_url = test_url
         
     def abrir_nodo(self):
         self.driver = webdriver.Remote(command_executor='http://selenium-hub:4444/wd/hub', desired_capabilities=DesiredCapabilities.FIREFOX)
-        self.driver.get('https://www.google.com')
+        self.driver.get('http://web:8000'+self.test_url)
 
     def reloadventana(self, argument):
         try:

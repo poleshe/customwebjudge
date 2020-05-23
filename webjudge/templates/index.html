@@ -62,7 +62,7 @@
 
                       <tbody>
                         {% for test in tests %}
-                          <tr>
+                          <tr onclick="location.href = '/reto/?test_id={{ test.id }}';">
                             <th scope="row"> {{test.name}} </th>
                             <td> {{ test.created_by}}</td>
                             <td> {{ test.test_tries}}</td>
