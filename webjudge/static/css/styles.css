@@ -10216,7 +10216,7 @@ body {
 
 .stepdescription:hover {
   background-color: rgba(0, 0, 0, 0.15) !important;
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 .deletestep{

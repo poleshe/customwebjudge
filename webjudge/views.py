@@ -52,8 +52,12 @@ class Index(LoginRequiredMixin, View):
         realuser = Users.objects.get(user=requestuser)
         #Cogemos todos los tests para enseñarlos en la lista
         tests = Tests.objects.all()
+        masintentos = Tests.objects.all().order_by('-test_tries')[:10]
+        masaciertos = Tests.objects.all().order_by('-test_correct')[:10]
+        masnuevos = Tests.objects.all().order_by('-id')[:10]
+        usermasaciertos = Users.objects.all().order_by('-tests_resolved')[:10]
         # Devolvemos la vista junto a los datos y el nombre del template.
-        return render(request, self.template, {'userinfo':realuser, 'tests':tests})
+        return render(request, self.template, {'userinfo':realuser, 'tests':tests, 'masintentos':masintentos, 'masaciertos':masaciertos, 'masnuevos':masnuevos, 'usermasaciertos':usermasaciertos})
 
     def post(self, request, *args, **kwargs):
         return render(request, self.template)
@@ -275,7 +279,9 @@ def intento(request):
         test_id = request.POST['test_id']
         # Creamos un objecto FileSystemStorage
         fs = FileSystemStorage()
-        # Cogemos los datos del test en la db.
+        # Cogemos los datos del test en la db y el usuario.
+        requestuser = User.objects.get(username=request.user.username)
+        realuser = Users.objects.get(user=requestuser)
         testdb = Tests.objects.get(id=test_id)
         # Comprobamos si este archivo ya existe. Si existe, lo borramos y creamos uno nuevo. 
         if os.path.exists("webjudge/testfiles/"+test_id+"/"+testdb.test_answer_name):
@@ -286,11 +292,22 @@ def intento(request):
         print("Archivo de Intento de Test guardado correctamente en "+fs.url("/templates/"+test_id+"/"+uploaded_file.name))
         valido = test_valido(request, test_id)
         os.rename("webjudge/testfiles/"+test_id+"/backup_"+testdb.test_answer_name, "webjudge/testfiles/"+test_id+"/"+testdb.test_answer_name)
+        testdb.test_tries = testdb.test_tries + 1
         if(valido == True):
-            print("El test con id "+str(test_id)+" es valido.")
+            print("El intento del test con id "+str(test_id)+" es valido.")
+            # Añadimos +1 a los correctos y guardamos
+            testdb.test_correct = testdb.test_correct + 1
+            testdb.save()
+            # Si el usuario no ha resuelto este test, añadimos a su perfil que lo ha logrado resolver.
+            if testdb.name not in realuser.tests_done:
+                # Añadimos el reto al usuario y añadimos +1 a los correctos del test
+                realuser.tests_done.append(testdb.name)
+                realuser.tests_resolved = realuser.tests_resolved + 1
+                realuser.save()
             return HttpResponse(status=200)
         else:
-            print("El test con id "+str(test_id)+" es invalido. Se borraran sus pasos.")
+            print("El intento del test con id "+str(test_id)+" ha fallado.")
+            testdb.save()
             return HttpResponse(status=500)
         
 

@@ -11,6 +11,7 @@ class Users(models.Model):
     name = models.CharField(max_length=255)
     surname = models.CharField(max_length=255)
     tests_done = ArrayField(models.CharField(max_length=255), null=True)
+    tests_resolved = models.IntegerField(default=0)
 
 # Contiene información general sobre los tests.
 class Tests(models.Model):

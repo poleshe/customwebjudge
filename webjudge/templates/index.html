@@ -8,16 +8,19 @@
 
               <div class="card" style=" margin: 1.6% 5% 0% 10%; text-align: left; width: 30%; float: left;">
               <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                  <div class="card-header">
+                    Resumen del Usuario
+                </div>
                   <div class="card-body">
                       <p> <b> Usuario: </b> {{ userinfo.user.username }}</p>
                       <p> <b> Nombre: </b> {{ userinfo.name }} {{ userinfo.surname }}</p>
                       <p> <b> Email: </b> {{ userinfo.user.email }}</p>
                       <p> En esta web eres un/a {{ userinfo.role }}/a.</p>
                   </div>
-                    <div class="card" style="min-height: 200px; max-height: 150px;margin: auto; margin-bottom: 5%; text-align: left; width: 90%; float: left; overflow-y: auto">
+                    <div class="card" style="min-height: 153px; max-height: 153px;margin: auto; margin-bottom: 5%; text-align: left; width: 90%; float: left; overflow-y: auto">
                       <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
-                      <div class="card-header">
-                        Retos realizados
+                      <div class="card-header" style="background-color: #343a40; font-weight: bold; color: white">
+                        Tus Retos completados:
                     </div>
                           <div class="card-body" style="height: 50px; overflow-y: auto;">
                             {% for test in userinfo.tests_done %}
@@ -32,23 +35,73 @@
                 <div class="card" style="margin: auto; margin-left: 1%; margin-bottom: 50px; text-align: center; width: 45%; height: 430px;">
                     <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
                   <div class="card-header">
-                      Estadísticas de los retos realizados
+                      Estadísticas de la web
                   </div>
                       <div class="card-body">
                         <div class="btn-group" role="group" aria-label="Basic example">
-                          <button type="button" class="btn btn-secondary">Mas Intentos</button>
-                          <button type="button" class="btn btn-secondary">Mas Aciertos</button>
-                          <button type="button" class="btn btn-secondary">Nuevos</button>
-                          <button type="button" class="btn btn-secondary">Usuario con mas aciertos</button>
+                          <button type="button" onclick="masintentos()" class="btn btn-secondary">Mas Intentos</button>
+                          <button type="button" onclick="masaciertos()" class="btn btn-secondary">Mas Aciertos</button>
+                          <button type="button" onclick="nuevos()" class="btn btn-secondary">Nuevos</button>
+                          <button type="button" onclick="usermasaciertos()" class="btn btn-secondary">Usuario con mas aciertos</button>
                         </div>
-                          
+                        <div style="overflow-y: scroll; position: relative; height:300px; margin-top: 15px;">
+                          <table class="table table-striped">
+                            <thead class="thead-dark">
+                              <tr>
+                                <th scope="col" id="llave"> Más intentos </th>
+                                <th scope="col" id="estadistica"> Nº de intentos </th>
+                              </tr>
+                            </thead>
+        
+                              <tbody style="display: table-row-group" id="masintentos">
+                                {% for test in masintentos %}
+                                    <tr class="stepdescription" onclick="location.href = '/reto/?test_id={{ test.id }}';" id="bodytable">
+                                        <th scope="row"> {{test.name}} </th>
+                                        <td> {{ test.test_tries}}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+
+
+                              <tbody style="display: none" id="masaciertos">
+                                {% for test in masaciertos %}
+                                    <tr class="stepdescription" onclick="location.href = '/reto/?test_id={{ test.id }}';" id="bodytable">
+                                    
+                                        <th scope="row"> {{test.name}} </th>
+                                        <td> {{ test.test_correct}}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+
+                              <tbody style="display: none" id="nuevos">
+                                {% for test in masnuevos %}
+                                    <tr class="stepdescription" onclick="location.href = '/reto/?test_id={{ test.id }}';" id="bodytable">
+                                    
+                                        <th scope="row"> {{test.name}} </th>
+                                        <td> {{ test.test_tries}}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+
+                              <tbody style="display: none" id="usermasaciertos">
+                                {% for user in usermasaciertos %}
+                                    <tr id="bodytable">
+                                    
+                                        <th scope="row"> {{user.name}} {{user.surname}} </th>
+                                        <td> {{ user.tests_resolved}}</td>
+                                    </tr>
+                                {% endfor %}
+                              </tbody>
+        
+                          </table>
+                        </div>
                       </div>
                   </div>
 
 
                   <div class="card" style="margin: auto; margin-bottom: 50px; text-align: center; width: 70%; max-height: 500px; overflow-y: scroll">
                     <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
-                  <div class="card-header">
+                  <div class="card-header" style="font-size: 30px">
                       Lista de retos disponibles
                   </div>
                   <table class="table table-striped">
@@ -56,16 +109,14 @@
                       <tr>
                         <th scope="col"> Título </th>
                         <th scope="col"> Creado por </th>
-                        <th scope="col"> Nº de intentos </th>
                       </tr>
                     </thead>
 
                       <tbody>
                         {% for test in tests %}
-                          <tr onclick="location.href = '/reto/?test_id={{ test.id }}';">
+                          <tr class="stepdescription" onclick="location.href = '/reto/?test_id={{ test.id }}';">
                             <th scope="row"> {{test.name}} </th>
                             <td> {{ test.created_by}}</td>
-                            <td> {{ test.test_tries}}</td>
 
                         {% endfor %}
                           </tr>
@@ -79,6 +130,44 @@
                       <button onclick="location.href='/newtest/'" class="btn btn-primary" style="width: 100%;"> Crear nuevo reto </button>
                     </div>
                   {% endif %}
+
+                  <script>
+                    function masintentos(){
+                      document.getElementById("masintentos").style.display = "table-row-group"
+                      document.getElementById("nuevos").style.display = "none"
+                      document.getElementById("usermasaciertos").style.display = "none"
+                      document.getElementById("masaciertos").style.display = "none"
+                      document.getElementById("llave").innerHTML = "Más intentos"
+                      document.getElementById("estadistica").innerHTML = "Nº de intentos"
+                    }
+
+                    function masaciertos(){
+                      document.getElementById("masintentos").style.display = "none"
+                      document.getElementById("nuevos").style.display = "none"
+                      document.getElementById("usermasaciertos").style.display = "none"
+                      document.getElementById("masaciertos").style.display = "table-row-group"
+                      document.getElementById("llave").innerHTML = "Más aciertos"
+                      document.getElementById("estadistica").innerHTML = "Nº de aciertos"
+                    }
+
+                    function nuevos(){
+                      document.getElementById("masintentos").style.display = "none"
+                      document.getElementById("nuevos").style.display = "table-row-group"
+                      document.getElementById("usermasaciertos").style.display = "none"
+                      document.getElementById("masaciertos").style.display = "none"
+                      document.getElementById("llave").innerHTML = "Más recientes"
+                      document.getElementById("estadistica").innerHTML = "Nº de intentos"
+                    }
+
+                    function usermasaciertos(){
+                      document.getElementById("masintentos").style.display = "none"
+                      document.getElementById("nuevos").style.display = "none"
+                      document.getElementById("usermasaciertos").style.display = "table-row-group"
+                      document.getElementById("masaciertos").style.display = "none"
+                      document.getElementById("llave").innerHTML = "Usuario"
+                      document.getElementById("estadistica").innerHTML = "Retos resueltos"
+                    }
+                  </script>
 
                 </main>
 
