@@ -8,8 +8,8 @@ services:
     ports:
       - "4444:4444"
     environment:
-      GRID_BROWSER_TIMEOUT: 10
-      GRID_TIMEOUT: 10
+      GRID_BROWSER_TIMEOUT: 30
+      GRID_TIMEOUT: 30
 
   chrome:
     image: selenium/node-chrome:3.141.59-20200515
@@ -42,7 +42,7 @@ services:
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: bash -c "apt-get update && apt-get install jq -y && ./wait-for-grid.sh && python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
