@@ -17,7 +17,7 @@ class Users(models.Model):
 class Tests(models.Model):
     name = models.CharField(max_length=255)
     created_by = models.CharField(max_length=255)
-    test_description = models.CharField(max_length=255)
+    test_description = models.CharField(max_length=1500)
     test_file_name = models.CharField(max_length=255, null = True)
     test_url = models.CharField(max_length=255, null=True)
     test_answer_name = models.CharField(max_length=255, null=True)

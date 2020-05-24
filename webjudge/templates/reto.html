@@ -9,7 +9,8 @@
                 <h1 class="mt-4"> {{ test.name }}</h1>
                 <br>
                 <ol class="breadcrumb mb-4" style="text-align: left; width: 70%; margin: auto">
-                    <p>  {{ test.test_description }}</p>
+                    <!-- el atributo lineabreaks sirve para hacer que cada escape de linea se codifique a un <br> -->
+                    <p>  {{ test.test_description|linebreaks }}</p>
                 </ol>
         </div>
 
@@ -24,7 +25,7 @@
                 </div>
             </div>
 
-        <div class="card" style="margin: auto; margin-left: 5%; margin-bottom: 50px; text-align: center; width: 35%; float: left;">
+        <div class="card" style="margin: auto; margin-left: 5%; margin-bottom: 50px; text-align: center; width: 35%; float: left; height: 160px">
             <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
             <div class="card-header">
                 Archivo con la respuesta (JavaScript)
@@ -37,6 +38,16 @@
                         <button type="submit"> Enviar intento </button>
                         <p style="margin: auto; text-align: center; color: green; display: none" id="subidojs"> Archivo subido correctamente! </p>
                     </form>
+                </div>
+            </div>
+
+            <div class="card" style="margin: auto; text-align: center; margin-top: 50px; margin-bottom: 50px; width: 60%; height: 200px; overflow-y: auto">
+                <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                <div class="card-header">
+                   Comprobación del reto
+                </div>
+                <div class="card-body" id="comprobacion">
+                    <p style="margin-top: 4%"> Esperando a que se suba un intento... </p>
                 </div>
             </div>
 
@@ -60,17 +71,17 @@
                 $("form#uploadformjs").submit(function(e) {
                     e.preventDefault();    
                     var formData = new FormData(this);
-
+                    document.getElementById("comprobacion").innerHTML = "<p style='color: black; font-weight: bold; margin-top: 2%; font-size: 26px'> Tu respuesta está siendo comprobada. <br /> ¡Mucha suerte! </p>"
                     $.ajax({
                         url: '/api/uploadanswer/',
                         type: 'POST',
                         data: formData,
                         statusCode: {
                             200: function (data) {
-                                console.log(" THIS SHIT WORKED ")
+                                document.getElementById("comprobacion").innerHTML = "<p style='color: green; font-weight: bold; margin-top: 2%; font-size: 26px'> ¡Enhorabuena! ¡Has completado el reto! <br> Se ha sumado a tus logros. </p>"
                             },
                             500: function () {
-                                console.log(" this shit didnt :((( ")
+                                document.getElementById("comprobacion").innerHTML = "<p style='color: red; font-weight: bold; margin-top: 2%; font-size: 26px'> Vaya... Tu respuesta ha fallado. <br> ¡Ánimo, prueba de nuevo! </p>"
                             }
                         },
                         cache: false,
