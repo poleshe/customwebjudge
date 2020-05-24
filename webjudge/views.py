@@ -271,6 +271,7 @@ def upload(request):
     # Devolvemos un 200
     return HttpResponse(200)
 
+# Intento de reto
 @csrf_exempt
 def intento(request):
     # Si nos llega un post, hacemos...
@@ -306,11 +307,15 @@ def intento(request):
             testdb.test_correct = testdb.test_correct + 1
             testdb.save()
             # Si el usuario no ha resuelto este test, añadimos a su perfil que lo ha logrado resolver.
-            if testdb.name not in realuser.tests_done:
+            if realuser.tests_done is None:
+                # si esta vacio no se puede iterar, ya que devuelve un objeto de tipo None, asi que la añadimos y ya.
+                realuser.tests_done = [testdb.name]
+                realuser.tests_resolved = realuser.tests_resolved + 1
+            if realuser.tests_done is not None and testdb.name not in realuser.tests_done:
                 # Añadimos el reto al usuario y añadimos +1 a los correctos del test
                 realuser.tests_done.append(testdb.name)
                 realuser.tests_resolved = realuser.tests_resolved + 1
-                realuser.save()
+            realuser.save()
             return HttpResponse(status=200)
         else:
             print("El intento del test con id "+str(test_id)+" ha fallado.")

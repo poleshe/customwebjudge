@@ -53,14 +53,14 @@
 
             {% if userinfo.role == 'Profesor' %}
 
-            <div class="card" style="margin: auto; text-align: center; width: 35%; height: 200px; overflow-y: auto">
+            <div class="card" style="margin: auto; text-align: center; width: 35%; height: 200px; overflow-y: auto; margin-bottom: 50px;">
                 <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
                 <div class="card-header">
                    ( Profesor ) Descargar archivos JS respuesta de los usuarios que han pasado el test
                 </div>
                 <div class="card-body">
                     {% for usuario in usuarios_resuelto %}
-                        <a href="/media/{{ test.id }}/{{ userinfo.name }}{{ userinfo.surname }}/{{ test.test_answer_name }}" download> {{ userinfo.name }} {{ userinfo.surname }}</a>
+                        <p> <a href="/media/{{ test.id }}/{{ usuario.name }}{{ usuario.surname }}/{{ test.test_answer_name }}" download> {{ usuario.name }} {{ usuario.surname }}</a> </p>
                     {% endfor %}
                 </div>
             </div>
