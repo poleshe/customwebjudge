@@ -46,8 +46,10 @@
                         </p>
 
                         <p style="margin-top: 20px;"> Argumento: <input type="text" style="width: 70%" id="step_args" disabled> </p>
+                        <p id="sintaxis" style="display:none; text-align: left;"> Escribe primero el ID / NAME del objeto, y luego el texto, separados por una coma. EJ: input1, Hola que tal</p>
+                        <p id="sintaxis2" style="display:none; text-align: left;"> Escribe primero la CLASE del objeto, luego la PROPIEDAD, y por ultimo el VALOR, separados por coma. Los colores se comprueban en RGB. EJ: container,  width, 500px</p>
                         <p id="basestepname" style="position: absolute; display: none"></p>
-                        <button type="button" onclick="add_step()" id="add_step" style="margin-top: 2%" class="btn btn-primary" disabled> Añadir paso </button>
+                        <button type="button" onclick="add_step()" id="add_step" style="margin-top: 2%; margin-bottom: 2%" class="btn btn-primary" disabled> Añadir paso </button>
                     </div>
                 </div>
         </div>
@@ -74,6 +76,8 @@
         // Se ejecuta al seleccionar un step
         function step_options(step_description, arguments, step_basename){
             // Cambiamos la descripcion por la del step
+            document.getElementById("sintaxis").style.display = "none";
+            document.getElementById("sintaxis2").style.display = "none";
             document.getElementById("step_desc").innerHTML = step_description;
             document.getElementById("basestepname").innerHTML = step_basename;
             // Si no tiene argumentos, dejamos añadir el paso directamente.
@@ -86,6 +90,14 @@
                 document.getElementById("step_args").disabled = false;
                 document.getElementById("step_args").value = ""
                 document.getElementById("add_step").disabled = true
+            }
+
+            if(step_description == 'En el objeto con ID ... escribir el TEXTO ...' || step_description == 'En el objeto con NAME ... escribir el TEXTO ...'){
+                document.getElementById("sintaxis").style.display = "block";
+            }
+
+            if(step_description == 'Buscar en el objeto con CLASE ... en la PROPIEDAD ... el VALOR ...'){
+                document.getElementById("sintaxis2").style.display = "block";
             }
 
             // Funcion keyup para detectar el argumento. Si hay algo escrito, podemos subirlo. Si no, se pone disabled el botón.

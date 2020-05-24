@@ -1,0 +1,30 @@
+<div class="card" style="margin: auto; margin-bottom: 50px; text-align: center; width: 100%; max-height: 500px; overflow-y: scroll"   id="search-results">
+    <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+  <div class="card-header" style="font-size: 25px">
+      Lista de retos disponibles
+      <input type="text" id="searchtest" onchange="searchtest()" placeholder="Buscar un reto..." value="{{ search_text }}" style="float: right; font-size: 20px;">
+  </div>
+  <table class="table table-striped">
+        {% if search %}
+        <tbody>
+        <thead class="thead-dark" style="text-align: center;">
+            <tr>
+                <th scope="col"> Título </th>
+                <th scope="col"> Creado por </th>
+            </tr>
+        </thead>
+          {% for test in search %}
+            <tr class="stepdescription" onclick="location.href = '/reto/?test_id={{ test.id }}';">
+              <th scope="row"> {{test.name}} </th>
+              <td> {{ test.created_by}}</td>
+          {% endfor %}
+
+        {% else %}
+
+           <p> No se han encontrado retos con el nombre {{ search_text }}.. </p>
+
+        {% endif %}
+      </tbody>
+
+  </table>
+  </div>

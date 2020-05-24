@@ -97,34 +97,9 @@
                         </div>
                       </div>
                   </div>
-
-
-                  <div class="card" style="margin: auto; margin-bottom: 50px; text-align: center; width: 70%; max-height: 500px; overflow-y: scroll">
-                    <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
-                  <div class="card-header" style="font-size: 30px">
-                      Lista de retos disponibles
+                  <div style="position: relative; width: 80%; margin: auto;">
+                  {% include "test_table.html" %}
                   </div>
-                  <table class="table table-striped">
-                    <thead class="thead-dark">
-                      <tr>
-                        <th scope="col"> Título </th>
-                        <th scope="col"> Creado por </th>
-                      </tr>
-                    </thead>
-
-                      <tbody>
-                        {% for test in tests %}
-                          <tr class="stepdescription" onclick="location.href = '/reto/?test_id={{ test.id }}';">
-                            <th scope="row"> {{test.name}} </th>
-                            <td> {{ test.created_by}}</td>
-
-                        {% endfor %}
-                          </tr>
-                      </tbody>
-
-                  </table>
-                  </div>
-
                   {% if userinfo.role == 'Profesor' %}
                     <div style="margin: auto; text-align: center; position: relative; width: 50%; margin-bottom: 40px;"> 
                       <button onclick="location.href='/newtest/'" class="btn btn-primary" style="width: 100%;"> Crear nuevo reto </button>
@@ -132,6 +107,27 @@
                   {% endif %}
 
                   <script>
+
+                    function searchtest(){
+                      reto = document.getElementById("searchtest").value;
+                      $.ajax({
+                          type: "GET",
+                          url: "/api/searchtest/",
+                          data: {
+                              'search_text' : reto,
+                          },
+                          success: searchSuccess,
+                          dataType: 'html'
+                      });
+ 
+                    }
+
+                    function searchSuccess(data, textStatus, jqXHR){
+                        $('#search-results').html(data)
+                    }
+
+
+
                     function masintentos(){
                       document.getElementById("masintentos").style.display = "table-row-group"
                       document.getElementById("nuevos").style.display = "none"
@@ -167,6 +163,8 @@
                       document.getElementById("llave").innerHTML = "Usuario"
                       document.getElementById("estadistica").innerHTML = "Retos resueltos"
                     }
+
+                    window.onload = searchtest()
                   </script>
 
                 </main>

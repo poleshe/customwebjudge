@@ -156,8 +156,10 @@ class Reto(LoginRequiredMixin, View):
         #Cogemos el test que queremos mostrar
         test_id = request.GET['test_id']
         test = Tests.objects.get(id=test_id)
+        usuarios_resuelto = Users.objects.filter(tests_done__contains=[])
+        print(usuarios_resuelto)
         # Devolvemos la vista junto a los datos y el nombre del template.
-        return render(request, self.template, {'userinfo':realuser, 'test':test})
+        return render(request, self.template, {'userinfo':realuser, 'test':test, 'usuarios_resuelto':usuarios_resuelto})
 
     def post(self, request, *args, **kwargs):
         return render(request, self.template)
@@ -291,6 +293,11 @@ def intento(request):
         fs.save(test_id+"/"+testdb.test_answer_name, uploaded_file)
         print("Archivo de Intento de Test guardado correctamente en "+fs.url("/templates/"+test_id+"/"+uploaded_file.name))
         valido = test_valido(request, test_id)
+        if(valido == True):
+            if os.path.exists("webjudge/testfiles/"+test_id+"/"+realuser.name+realuser.surname+"/"+testdb.test_answer_name):
+                print("El archivo de respuesta para este usuario ya existia. Reemplazando...")
+                os.remove("webjudge/testfiles/"+test_id+"/"+realuser.name+realuser.surname+"/"+testdb.test_answer_name)
+            fs.save(test_id+"/"+realuser.name+realuser.surname+"/"+testdb.test_answer_name, uploaded_file)
         os.rename("webjudge/testfiles/"+test_id+"/backup_"+testdb.test_answer_name, "webjudge/testfiles/"+test_id+"/"+testdb.test_answer_name)
         testdb.test_tries = testdb.test_tries + 1
         if(valido == True):
@@ -389,6 +396,23 @@ def execute_test(request):
         result = getattr(step_executer, step.basestep_name)(step.step_argument)
         print(result)
 
+@csrf_exempt
+def searchtest(request):
+    if request.method == "GET":
+        search_text = request.GET['search_text']
+        tests = Tests.objects.all()
+        if search_text != "":
+            search_text = request.GET['search_text']
+            statuss = Tests.objects.filter(name__contains = search_text)
+            
+            if statuss:
+                print(" Se han encontrado queries")
+            else:
+                statuss = []
+        else:
+            statuss = tests
+        
+        return render(request, 'test_table.html', {'search':statuss, 'tests':tests, 'search_text':search_text})
 
 
 ####################################################################
@@ -464,9 +488,27 @@ class Step_Execution():
                 time.sleep(1)
 
     def escribirenid(self, argument):
+        # Separar el argumento solo por la primera coma, las demas no separa.
+        argumento_separado = argument.split(',', 1)
+        id_objeto = argumento_separado[0]
+        texto = argumento_separado[1]
         try:
-            input_object = self.driver.find_element_by_name(argument)
-            input_object.send_keys(argument)
+            input_object = self.driver.find_element_by_id(id_objeto)
+            input_object.send_keys(texto)
+            return True
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+            return False
+        
+    def escribirenname(self, argument):
+        # Separar el argumento solo por la primera coma, las demas no separa.
+        argumento_separado = argument.split(',', 1)
+        id_objeto = argumento_separado[0]
+        texto = argumento_separado[1]
+        try:
+            input_object = self.driver.find_element_by_name(id_objeto)
+            input_object.send_keys(texto)
             return True
         except Exception as e:
             print(e)
@@ -484,6 +526,44 @@ class Step_Execution():
             self.driver.quit()
             return False
 
+    def clickenclase(self, argument):
+        try:
+            self.driver.find_elements_by_class_name(argument).click()
+            return True
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+            return False
+    
+    def clickenlink(self, argument):
+        try:
+            self.driver.find_elements_by_link_text(argument).link
+            return True
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+            return False
+
+    def comprobarelemento(self, argument):
+        # Separar el argumento solo por la primera coma y segunda coma, las demas no separa.
+        # Encuentra si un objeto con la clase X tiene el valor Y en la propiedad Z, es decir, el objeto .container tiene el valor "red" en background-color
+        argumento_separado = argument.split(',', 2)
+        clase = argumento_separado[0].strip()
+        propiedad = argumento_separado[1].strip()
+        valor = argumento_separado[2].strip()
+        try:
+            resultado = self.driver.find_elements_by_class_name(clase)[0].value_of_css_property(propiedad)
+            print(resultado)
+            print(valor)
+            if resultado != valor:
+                self.driver.quit()
+                return False
+            else:
+                return True
+        except Exception as e:
+            print(e)
+            self.driver.quit()
+            return False
         
 
     

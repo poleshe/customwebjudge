@@ -37,6 +37,7 @@ urlpatterns = [
     routers.url(r'^api/checksteps/', views.create_temporal_test_steps),
     routers.url(r'^api/createteststeps/', views.create_test_steps),
     routers.url(r'^api/uploadanswer/', views.intento, name='intento'),
+    routers.url(r'^api/searchtest/', views.searchtest, name='searchtest'),
     routers.url(r'^signup/$', views.signup, name='signup'),
 ]
 

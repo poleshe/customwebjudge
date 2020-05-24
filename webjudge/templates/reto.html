@@ -34,11 +34,28 @@
                         {% csrf_token %}
                         <input type="text" name="test_id" id="test_id" value="{{ test.id }}" hidden>
                         <input type="file" name="document">
-                        <button type="submit"> Enviar al servidor </button>
+                        <button type="submit"> Enviar intento </button>
                         <p style="margin: auto; text-align: center; color: green; display: none" id="subidojs"> Archivo subido correctamente! </p>
                     </form>
                 </div>
             </div>
+
+            {% if userinfo.role == 'Profesor' %}
+
+            <div class="card" style="margin: auto; text-align: center; width: 35%; height: 200px; overflow-y: auto">
+                <!-- Estilo: Cartas de Bootstrap. https://getbootstrap.com/docs/4.0/components/card/ -->
+                <div class="card-header">
+                   ( Profesor ) Descargar archivos JS respuesta de los usuarios que han pasado el test
+                </div>
+                <div class="card-body">
+                    {% for usuario in usuarios_resuelto %}
+                        <a href="/media/{{ test.id }}/{{ userinfo.name }}{{ userinfo.surname }}/{{ test.test_answer_name }}" download> {{ userinfo.name }} {{ userinfo.surname }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% endif %}
+
             <script>
                 $("form#uploadformjs").submit(function(e) {
                     e.preventDefault();    
