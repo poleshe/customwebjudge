@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="ca">
+
+<head>
+	<meta charset="UTF-8" />
+	<title>PRÀCTICA 05</title>
+
+	<link href="codi/estil.css" rel="stylesheet" type="text/css" />
+	<script src="cesar.js"></script>
+	<script>
+		function codifica(entrada, clau) {
+			var paraulaxifrada = new Cesar(entrada, clau);
+			paraulaxifrada.xifrar();
+			var resultat = paraulaxifrada.mostrarMissatge();
+			return (document.form.sortida.value = resultat);
+		}
+
+		function decodifica(entrada, clau) {
+			var resultat = paraulaxifrada.mostrarMissatge();
+			return (document.form.sortida.value = resultat);
+		}
+	</script>
+</head>
+
+<body>
+	<header>DAW0620-CTRA - Xifrat per alfabet desplaçat</header>
+	<br />
+
+	<div id="control" class="esquerre">
+		<form name="form" id="form">
+			<label for="entrada">Entrada:
+				<input type="text" name="entrada" id="entrada" pattern="[A-Z0-9]" title="Entrada de missatge" required="required"
+				 size="50" maxlength="50" />
+			</label>
+			<label for="clau">Clau o decalatge:
+				<input type="number" name="clau" id="clau" size="5" maxlength="2" min="0" value="3" title="Clau" />
+			</label>
+			<fieldset>
+				<legend>Codifica/Decodifica</legend>
+				<input type="button" name="btn_cod" id="btn_cod" value="codifica" onclick="codifica(document.form.entrada.value,document.form.clau.value)" />
+				<input type="button" name="btn_dec" id="btn_dec" value="decodifica" onclick="decodifica(document.form.entrada.value,document.form.clau.value)" />
+			</fieldset>
+			<label for="sortida">Sortida:
+				<input type "text" name="sortida" id="sortida" contenteditable="false" size="50" maxlength="50" title="Sortida de missatge" />
+			</label>
+			<input type="reset" />
+		</form>
+	</div>
+
+	<div id="explicacio" class="dreta">
+		<p>En criptografia, el xifrat César, també conegut com xifrat per desplaçament, codi de Cèsar o desplaçament de
+			Cèsar, és una de les tècniques de codificació més simples i més usades. És un tipus de xifrat per substitució en el
+			qual una lletra en el text original és reemplaçada per una altra lletra que es troba un nombre fix de posicions més
+			endavant en l'alfabet.</p>
+		<p>Per exemple, amb un desplaçament de 3, la A seria substituïda per la D (situada 3 llocs a la dreta de l'A), la B
+			seria reemplaçada per la I, etc. Aquest mètode deu el seu nom a Juli Cèsar, que l'usava per comunicar-se amb els
+			seus generals.</p>
+		<p>El alfabet que utilitzarem en aquest control serà el següent: "ABCÇDEFGHIJKLMNÑOPQRSTUVWYXZ0123456789". Sense
+			minúscules ni accents. Exemple: els caràcters a, A, à o á seran el mateix caràcter, A i serà substituït per la Ç si
+			la clau o decalatge fos 3. Qualsevol altre caràcter es deixarà sense substituir. </p>
+
+	</div>
+
+	<div id="temps">
+		<p>TEMPS: 60 minuts</p>
+	</div>
+
+	</br>
+	<footer>
+		2020 Departament d'Informàtica - INS LA PINEDA - BADALONA<span>DAW M06-Desenvolupament Web en Entorn Client</span>
+	</footer>
+</body>
+
+</html>

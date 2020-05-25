@@ -156,7 +156,7 @@ class Reto(LoginRequiredMixin, View):
         #Cogemos el test que queremos mostrar
         test_id = request.GET['test_id']
         test = Tests.objects.get(id=test_id)
-        usuarios_resuelto = Users.objects.filter(tests_done__contains=[])
+        usuarios_resuelto = Users.objects.filter(tests_done__contains=[test.name])
         print(usuarios_resuelto)
         # Devolvemos la vista junto a los datos y el nombre del template.
         return render(request, self.template, {'userinfo':realuser, 'test':test, 'usuarios_resuelto':usuarios_resuelto})
@@ -472,7 +472,7 @@ class Step_Execution():
 
     def clickonid(self, argument):
         try:
-            self.driver.find_element_by_name(argument).click()
+            elemento = self.driver.find_element_by_id(argument).click()
             return True
         except Exception as e:
             print(e)
@@ -481,25 +481,88 @@ class Step_Execution():
     
     def esperartexto(self, argument):
         count=0
-        max_tries = 10
+        max_tries = 5
+        print(argument)
+
+        argumento_separado = argument.split(',', 1)
+        id_objeto = argumento_separado[0].strip()
+        texto = argumento_separado[1].strip()
+
+        try:
+            input_object = self.driver.find_element_by_id(id_objeto)
+            text1 = input_object.get_attribute("value")
+            text2 = input_object.get_attribute("innerHtml")
+            print(text1)
+            print(text2)
+        except Exception as e:
+            print ("No Encontrado, haciendo loop...")
+            text = None
+
         while True:
-            if argument in self.driver.page_source:
+            if text1==texto or text2==texto:
                 return True
             if count > max_tries:
                 self.driver.quit()
                 return False
             else:
+                print ("No Encontrado, haciendo loop... "+str(count))
+                try:
+                    input_object = self.driver.find_element_by_id(id_objeto)
+                    text1 = input_object.get_attribute("value")
+                    text2 = input_object.get_attribute("innerHtml")
+                except Exception as e:
+                    print ("No Encontrado, haciendo loop...")
+                    text = None
+                count+=1
+                time.sleep(1)
+
+    def esperartextoennombre(self, argument):
+        count=0
+        max_tries = 5
+
+        argumento_separado = argument.split(',', 1)
+        id_objeto = argumento_separado[0].strip()
+        texto = argumento_separado[1].strip()
+
+        try:
+            input_object = self.driver.find_element_by_name(id_objeto)
+            text1 = input_object.get_attribute("value")
+            text2 = input_object.get_attribute("innerHtml")
+            print(text1)
+            print(text2)
+        except Exception as e:
+            print ("No Encontrado, haciendo loop...")
+            text = None
+
+        while True:
+            if text1==texto or text2==texto:
+                return True
+            if count > max_tries:
+                self.driver.quit()
+                return False
+            else:
+                print ("No Encontrado, haciendo loop... "+str(count))
+                try:
+                    input_object = self.driver.find_element_by_name(id_objeto)
+                    text1 = input_object.get_attribute("value")
+                    text2 = input_object.get_attribute("innerHtml")
+                except Exception as e:
+                    print ("No Encontrado, haciendo loop...")
+                    text = None
                 count+=1
                 time.sleep(1)
 
     def escribirenid(self, argument):
         # Separar el argumento solo por la primera coma, las demas no separa.
         argumento_separado = argument.split(',', 1)
-        id_objeto = argumento_separado[0]
-        texto = argumento_separado[1]
+        id_objeto = argumento_separado[0].strip()
+        texto = argumento_separado[1].strip()
         try:
-            input_object = self.driver.find_element_by_id(id_objeto)
-            input_object.send_keys(texto)
+            self.driver.execute_script('document.getElementById("'+id_objeto+'").value = "'+texto+'"')
+            self.driver.execute_script('document.getElementById("'+id_objeto+'").innerText = "'+texto+'"')
+            input_object = self.driver.find_element_by_id('entrada')
+            text = input_object.get_attribute("value")
+            print("Texto: "+text)
             return True
         except Exception as e:
             print(e)
@@ -509,8 +572,8 @@ class Step_Execution():
     def escribirenname(self, argument):
         # Separar el argumento solo por la primera coma, las demas no separa.
         argumento_separado = argument.split(',', 1)
-        id_objeto = argumento_separado[0]
-        texto = argumento_separado[1]
+        id_objeto = argumento_separado[0].strip()
+        texto = argumento_separado[1].strip()
         try:
             input_object = self.driver.find_element_by_name(id_objeto)
             input_object.send_keys(texto)
